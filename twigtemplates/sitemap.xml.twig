@@ -6,14 +6,14 @@
       xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 <url>
-  <loc>https://thecodes.ga/</loc>
+  <loc>https://YOUR_SITE_URL/</loc>
   <lastmod>2019-06-18T12:28:57+00:00</lastmod>
   <priority>1.00</priority>
 </url>
-{% for item in fetch("companies_extended") if item.Publish == 'true'%}
+{% for item in fetch("Post") if item.Publish == 'true'%}
 <url>
-  <loc>https://thecodes.ga/company/{{item.Slug}}</loc>
-  <lastmod>{{item.LatestDate | date('Y-m-d\\TH:i:s')}}+00:00</lastmod>
+  <loc>https://YOUR_SITE_URL/post/{{item.Slug}}</loc>
+  <lastmod>{{item.Date | date('Y-m-d\\TH:i:s')}}+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 {% endfor %}

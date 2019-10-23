@@ -29,19 +29,24 @@
               <label class="upload" for="inputfile{{GlobalIncrementer}}">Upload</label>
             </card>
           </div>
-    
-          <div decorator='sortable' class="cardholder" on-click="@this.fire('imgSelect', slug)" >
+          
+          {{#if slug}}
+          <div  class="cardholder" on-click="@this.fire('imgSelect', slug)" >
               <card style="position:relative" >
                   <div style="text-align: center; height:3rem; overflow: auto;">
                     {{slug}}
                   </div>
                   <div xx class="img" style="background-image:url('{{HOSTNAME}}image.php?id={{slug}}&forcethumb')">
                   </div>
+                  <button type="button" class="remove_btn" on-tap="@this.set('slug', null)" xx  title="Remove file">
+                    <i class="glyphicon glyphicon-remove"></i>
+                  </button>                  
                   <a btn class="download_btn" href="{{HOSTNAME}}image.php?id={{.slug}}" title="Download file" download="{{.slug}}" xx >
                       <i class="glyphicon glyphicon-download-alt"></i>
                   </a>                
               </card>
           </div>
+          {{/if}}
 
     
       </div>
@@ -412,8 +417,8 @@
           })
     
           this.on('imgSelect', function(r){
-              //console.log('imgSelect',r)
-              self.set('imgSelect', r.slug)
+              console.log('imgSelect',r)
+              self.set('imgSelect', r)
           })
     /*
           this.on('confirm', function(r){
