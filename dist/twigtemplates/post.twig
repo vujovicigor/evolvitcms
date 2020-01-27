@@ -1,9 +1,0 @@
-{% extends "base.twig" %}
-{% set slug = _GET['1'] %}
-{% set Post = fetch("Post", {id:slug})[0] %}
-{% block description %}{{Post.Description}}{% endblock %}
-{% block content %}
-	<h5>{{Post.Title}} <tag style="float:right; text-transform: none;">Posted at {{Post.Date}}</tag></h5>
-  {% if Post.Image %} <img src="img/{{Post.Image}}"> {% endif %}
-  <div style="margin-top: 1rem;" >{{Post.Body | raw}} </div> 
-{% endblock %}
