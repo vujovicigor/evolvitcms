@@ -115,8 +115,52 @@
               //console.log('onBlurCodeview', contents, $editable)
               //$(this).html(contents);
             },                  
+            onImageUpload: function (data) {
+              //console.log('onImageUpload', data[0])
+              var files = data//.pop();
+
+              //for (var i=0; i<files.length;i++){
+                var data = new FormData()
+                data.append('file', files[0]);
+                data.append('selectedfolder', '')
+  
+                //resp = 
+                fetch(HOSTNAME+'uploadfile.php', {
+                    method: 'POST',
+                    credentials:'same-origin',
+                    //'Content-Type': 'application/json',
+                    body: data
+                })
+                .then(function(resp){
+                  return resp.text()
+                })
+                .then(function(slug){
+                  setTimeout( function(){
+                    //console.log('pasteHTML', `<img src="image.php?id=${slug}">`);
+                    $('#summernote').summernote( 'pasteHTML', `<img src="image.php?id=${slug}">` );
+                  }, 150 );
+                })
+                    //console.log('up resp',resp)
+                //izitoast.success({ message: 'File '+(i+1)+' of '+ files.length+' uploaded.'});
+               // var slug = await resp.text()
+                //console.log('up resp', slug)
+               // setTimeout( function(){
+//                  $('#summernote').summernote( 'insertText', `<img src="image.php?id=${slug}">` );
+               //   $('#summernote').summernote( 'pasteHTML', `<img src="image.php?id=${slug}">` );
+               // }, 10 );
+
+                //self.set('imgSelect', slug)
+                //add_file(slug)
+                    //self.fire('refresh')                      
+              //}
+              data = []
+              return []
+            },
+
             // Clear all formatting of the pasted text
             onPaste: function (e) {
+                //console.log('onPaste', e, e.originalEvent.clipboardData.items)
+                //return false;
                 var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
                 e.preventDefault();
                 setTimeout( function(){
