@@ -1,12 +1,12 @@
 <section xx style="padding-bottom:0; padding-top:2rem; display:flex; flex-flow: column; flex:1; max-width: unset;">
     <div style="display:flex;">
-        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Info'?'#679':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Info')" >Info</button>
-        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Fields'?'#679':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Fields')" >Fields</button>
-        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='PHP'?'#679':'#fff'}}" default type="button" on-click="@this.set('selectedTab','PHP')" >PHP Template</button>
-        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='TWIG'?'#679':'#fff'}}" default type="button" on-click="@this.set('selectedTab','TWIG')" >TWIG Template</button>
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Info'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Info')" >Info</button>
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Fields'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Fields')" >Fields</button>
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='PHP'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','PHP')" >PHP Template</button>
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='TWIG'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','TWIG')" >TWIG Template</button>
 <!--
-        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='List View'?'#679':'#fff'}}" default type="button" on-click="@this.set('selectedTab','List View')" >List View</button>
-        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Detail View'?'#679':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Detail View')" >Detail View</button>
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='List View'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','List View')" >List View</button>
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Detail View'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Detail View')" >Detail View</button>
 -->
     </div>
     <!-- PHP Templates -->
@@ -172,11 +172,11 @@
 {{#if showSchemaFiledAdd }}
 <modal show="{{showSchemaFiledAdd}}" title="Create New Field in {{row.name}}" 
 class="animated fadeInRight" showOverlay="{{true}}" showHeader="{{true}}" style="
-height: calc(100vh - 47px);
+height: calc(100vh - 6rem);
 width: 46em;
 left: calc(50% - 23em);
 right: inherit;
-top: 44px;
+top: 6rem;
 bottom: inherit;
 " >
     <SchemaFiledAdd G={{.}} table_name={{row.name}} update={{false}} show="{{showSchemaFiledAdd}}"></SchemaFiledAdd>
@@ -187,11 +187,11 @@ bottom: inherit;
 {{#if showSchemaFiledUpdate }}
 <modal show="{{showSchemaFiledUpdate}}" title="Update Field in {{row.name}}" 
 class="animated fadeInRight" showOverlay="{{true}}" showHeader="{{true}}" style="
-height: calc(100vh - 47px);
+height: calc(100vh - 6rem);
 width: 46em;
 left: calc(50% - 23em);
 right: inherit;
-top: 44px;
+top: 6rem;
 bottom: inherit;
 " >
     <SchemaFiledAdd G={{.}} table_name={{row.name}} row={{selected_row}} update={{true}} show="{{showSchemaFiledUpdate}}"></SchemaFiledAdd>
@@ -212,7 +212,7 @@ bottom: inherit;
 .tabz:hover{
     box-shadow: none !important;
     background:0 !important;
-    border-bottom-color:#679 !important;
+    border-bottom-color:var(--primary) !important;
 }
 </style>
 <script>

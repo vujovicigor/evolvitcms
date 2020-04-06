@@ -63,6 +63,11 @@
         //print_r($sqlstring);
         //print_r($params);
         if (!isset($params['_session_user_role'])) $params['_session_user_role'] = 1;
+        
+        //$params = array_replace($params, $_SESSION); // remove keys containing array 
+        // copy keys from SESSION to params
+        if ( session_status() == PHP_SESSION_ACTIVE  )
+          foreach ($_SESSION as $key => $value) { if (is_string($value)) $params[$key] = $value; }
 
         if ($orgsqlstring == 'get_usec') {
           $t = gettimeofday();
@@ -132,12 +137,12 @@
             $patterns = array_keys($params);
             foreach ($patterns as $key => $value) { $patterns[$key] = '/`:\b'.$value.'\b`/i'; }
             $replacements = array_values($params);
-            foreach ($replacements as $key => $value) { $replacements[$key] = '`'.$value.'`'; }
+            foreach ($replacements as $key => $value) {  $replacements[$key] = '`'.$value.'`'; }
             $sqlstring = preg_replace($patterns,$replacements,$sqlstring);            
 
             // replace :`param` with value
             $patterns = array_keys($params);
-            foreach ($patterns as $key => $value) { $patterns[$key] = '/:`\b'.$value.'\b`/i'; }
+            foreach ($patterns as $key => $value) {  $patterns[$key] = '/:`\b'.$value.'\b`/i'; }
             $replacements = array_values($params);
             $sqlstring = preg_replace($patterns,$replacements,$sqlstring);            
             //echo json_encode(array('s'=>$sqlstring)); // todo

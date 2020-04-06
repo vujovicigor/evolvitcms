@@ -4,7 +4,7 @@
       <input type="file" multiple name="file" id="inputfile" class="inputfile">
       <label class="upload" for="inputfile" >Upload file here</label>
        <span style="padding: 1rem;"> OR </span>     
-      <div class="upload" style="border:dashed 1px #679" xx> Drag & Drop files here</div>
+      <div class="upload" style="border:dashed 1px var(--primary)" xx> Drag & Drop files here</div>
   </div>
 -->
 <!--
@@ -70,11 +70,11 @@
 
 {{#if showFullScreen}}
 <modal show="{{showFullScreen}}" zoomFrom="ib{{showFullScreenObj.id}}" cw="{{cw}}" title="{{showFullScreenObj.name}}" showOverlay="{{true}}" style="
-height: calc(100% - 45px);
+height: calc(100% - 6rem);
 width: 100%;
 left: 0;
 right: inherit;
-top: 45px;
+top: 6rem;
 bottom: inherit;" >
   <ShowImage show="{{showFullScreen}}" imgObj={{showFullScreenObj}} ></ShowImage>
 </modal>
@@ -84,11 +84,11 @@ bottom: inherit;" >
 
 {{#if showCropperModal}}
 <modal show="{{showCropperModal}}"  cw="{{cw}}" title="{{showFullScreenObj.name}}" showOverlay="{{true}}" style="
-height: calc(100% - 45px);
+height: calc(100% - 6rem);
 width: 100%;
 left: 0;
 right: inherit;
-top: 45px;
+top: 6rem;
 bottom: inherit;" >
   <div style="width:100; height:calc(100% - 40px)">
     <img style="max-width: 100%;" id="cropperImage" src="../images/word.png">
@@ -117,7 +117,7 @@ bottom: inherit;" >
   margin-bottom: 0;
   border-radius: 50%; 
   padding: 0.9rem 0.9rem;
-  color: #679;
+  color: var(--primary);
 }
 .remove_btn {
   opacity:0;
@@ -134,7 +134,7 @@ bottom: inherit;" >
 cursor: pointer;
 }
 .tag:hover, .selectedfolder {
-background-color: #679;
+background-color: var(--primary);
 color: #ffffff;
 }
 .cardholder{ 
@@ -151,10 +151,10 @@ color: #ffffff;
   justify-content: center;
 
   cursor: pointer;
-  color: #679;
+  color: var(--primary);
   padding: 1.4rem 2rem;
   background: #fff;
-  border: 1px solid #679;
+  border: 1px solid var(--primary);
   border-radius: 2px;
   box-shadow: 0 0 0 transparent;
   text-transform: uppercase;
@@ -222,13 +222,13 @@ card:hover {
   margin-top: 1rem;
 }
 .subheader {
-  color: #679;
+  color: var(--primary);
   font-size: 1.8rem;
   margin-right: 0.5rem;
   margin-left: 0.5rem;    
 }    
 .hr{
-  flex: 1; background: 1px #679;height: 1px;
+  flex: 1; background: 1px var(--primary);height: 1px;
 }
 </style>
 <script>

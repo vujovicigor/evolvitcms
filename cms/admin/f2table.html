@@ -2,7 +2,7 @@
     {{#showSearch}}
           <input value="{{filterfield}}" style="margin-bottom: 0 !important; padding-bottom: 0.5rem; text-align: center;"  placeholder="Search" > 
     {{/}}
-    <div class="flexGrid" style="box-sizing: border-box; display:box; display: flex; background-color: #679; color: #fff; flex-shrink:0; align-items: center;">
+    <div class="flexGrid" style="box-sizing: border-box; display:box; display: flex; background-color: var(--primary); color: #fff; flex-shrink:0; align-items: self-start;">
       {{#if showHeaders}}
 <!--        <div class="flexGridHead {{variableRowHeight?'':'truncate'}}" style="width:3px; margin-top:1px; padding: 0"></div> -->
         {{#columns}}
@@ -137,7 +137,7 @@
 
 <style>
 .subTitle{
-    background-color: #679;
+    background-color: var(--primary);
     color: white;
     position: sticky;
     top: 0px;
@@ -153,7 +153,7 @@ select:hover, select:active, select:focus { background-color:#fff !important;}
     position: absolute;
     width: 1px;
     height: 100%;
-    background-color: #679;
+    background-color: var(--primary);
     top: 0;
     left: 0;
     bottom: 0;
@@ -171,7 +171,8 @@ select:hover, select:active, select:focus { background-color:#fff !important;}
 
 
 .flexGridHead {
-    font-weight: 700;
+    word-break: break-word !important;
+    font-weight: 400;
     cursor:pointer;
     -webkit-user-select: none;  
     -moz-user-select: none;    
