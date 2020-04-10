@@ -1,4 +1,5 @@
 {% extends "base.twig" %}
+
 {% set slug = _GET['1'] %}
 {% set Post = fetch("Post", {id:slug})[0] %}
 {% block description %}{{Post.Description}}{% endblock %}

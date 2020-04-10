@@ -14,6 +14,8 @@
 
     // helper functions for splitting comma separated string for old sqlite (without with statement)
     $db->sqliteCreateFunction('substr_count', 'substr_count', 2); // or createFunction if type is Sqlite3 or SQLiteDatabase
+    $db->sqliteCreateFunction('password_hash', 'password_hash2', 1); 
+    $db->sqliteCreateFunction('password_verify', 'password_verify', 2); 
     $db->sqliteCreateFunction('explode_by_index', 'explode_by_index', 2);
     $db->sqliteCreateFunction('makeSlugs', 'makeSlugs', 1);
     
@@ -38,6 +40,10 @@
         return $arr[$index];
     }
     
+    function password_hash2($pass){
+      return password_hash($pass, PASSWORD_BCRYPT);
+    }
+
     function remove_extra_params($sql, $in_params){
         $res = array();
         preg_match_all("/\:(\w+)/", $sql, $matches);

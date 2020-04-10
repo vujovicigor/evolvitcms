@@ -2,6 +2,13 @@
         <grid style="flex:1; overflow:auto;">
             {{#each cols}}
     
+            {{#if .compType=='PASS' && .visible_details=='true'}}
+            <div col='1/1' class="f" xx>
+                <label class="l" xx>{{.nice_name}}</label>
+                <input style="width: calc(100% - 15rem)" type="password" title="{{.tooltip}}" placeholder="{{.placeholder}}" value={{row[.compId]}}  >
+            </div>
+            {{/if}}
+
             {{#if .compType=='TEXT' && .visible_details=='true'}}
             <div col='1/1' class="f" xx>
                 <label class="l" xx>{{.nice_name}}</label>
