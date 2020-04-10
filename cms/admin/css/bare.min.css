@@ -112,21 +112,20 @@ input[type=submit],
   line-height: 1rem;
   margin: 0 1rem 1rem 0;
   -webkit-appearance: none;
-}
-button:not([class]):before,
-button[xx]:before,
-input[type=submit]:before,
-[btn]:before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-  transform: scale3d(1.2, 1.2, 1.2);
-  background: #203554;
+  /*
+	&:before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		opacity: 0;
+		width: 100%;
+		height: 100%;
+		left: 0;
+		top: 0;
+		transform: scale3d(1.2,1.2,1.2);
+		background: @primary;
+	}
+	*/
 }
 button:not([class]):not(:disabled):hover,
 button[xx]:not(:disabled):hover,
