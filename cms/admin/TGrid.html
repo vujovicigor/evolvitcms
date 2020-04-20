@@ -34,12 +34,12 @@
 <!--zoomFrom="{{currFilterIndex}}"-->
 <modal show="{{showDetails}}"  cw="{{cw}}" title="{{G.schemas[~/selected_tablename].nice_name}} details" 
 class="animated fadeInRight" showOverlay="{{false}}" style="
-height: initial;
-width: auto;
-left: 20%;
-right: 0;
-top: 6rem;
-bottom: 0;" >
+height: min(44em, calc(100vh - 60px) );
+width: min(64em, 100vw);
+left: calc(50% - min(64em, 100vw)/2);
+right: inherit;
+top: calc(50% - min(44em, 100vh - 120px)/2);
+bottom: inherit;" >
     <TDetails row={{row}} update={{true}} cols={{columns}} show="{{showDetails}}" tablename={{selected_tablename}} G={{G}}></TDetails>
 </modal>
 {{/if}}
@@ -60,11 +60,11 @@ bottom: inherit;" >
 
 {{#if addNew && selected_tablename != "_Folders"}}
 <modal show="{{addNew}}" zoomFrom="addNew" cw="{{cw}}" title="Add new {{G.schemas[~/selected_tablename].nice_name}}" showOverlay="{{true}}" style="
-height: 44em;
-width: 64em;
-left: calc(50% - 25em);
+height: min(44em, calc(100vh - 60px) );
+width: min(64em, 100vw);
+left: calc(50% - min(64em, 100vw)/2);
 right: inherit;
-top: calc(50% - 22em);
+top: calc(50% - min(44em, 100vh - 120px)/2);
 bottom: inherit;" >
     <TDetails show="{{addNew}}" update={{false}} cols={{columns}} tablename={{selected_tablename}} G={{G}}></TDetails>
 </modal>

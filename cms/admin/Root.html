@@ -1,85 +1,84 @@
+{{#if is_logedin && !init}}
+  <nav style="z-index: 1039;" id="nav">
+      <header>
+        <!-- you can leave this empty if you don't want a title -->
+        <a style="left: 0; top: 0; bottom: 0; padding: 1rem 2rem;" on-click="@this.set('selectedModule',null)">
+            <img src="../images/Admin_panel_logo.png">
+            {{selectedModule? selectedModule=='ImageBrowser'?'Media':selected_tablename_obj.nice_name:'Admin Panel'}}
+        </a>      
+      </header>
+      <!-- this label allows the checkbox to be activated by clicking anywhere in the nav -->
+      <label>
+          <!-- checkbox required for responsiven menu -->
+          <input type="checkbox" id="menuOpen" checked={{menuOpen}}>
+          
+          <!-- bareCSS will use the header to contain the hamburger menu -->
 
-<nav style="z-index: 1044;" id="nav">
-        <header>
-                <!-- you can leave this empty if you don't want a title -->
-                <a style="left: 0; top: 0; bottom: 0; padding: 1rem 2rem;" on-click="@this.set('selectedModule',null)">
-                    <img src="../images/Admin_panel_logo.png">
-                    {{selectedModule? selectedModule=='ImageBrowser'?'Media':selected_tablename_obj.nice_name:'Admin Panel'}}
-                </a>
-                
-            </header>
-    <!-- this label allows the checkbox to be activated by clicking anywhere in the nav -->
-    <label>
-        <!-- checkbox required for responsiven menu -->
-        <input type="checkbox" id="menuOpen" checked={{menuOpen}}>
-        
-        <!-- bareCSS will use the header to contain the hamburger menu -->
+          
+          <!-- the main navigation items are anchor links within an unordered list -->
+          <ul>
+          
+              <li>
+                  <a on-click="@this.set('selectedModule',null)" style="{{!selectedModule?'border-color:white;':''}}" ><span class="glyphicon glyphicon-home"></span> Home</a>
+              </li>
+          
+              <!-- Only SA can usee media -->
+              {{#if _session_user_role == 2}}
+              <li>
+                  <a on-click="@this.set('selectedModule','ImageBrowser')" style="{{selectedModule=='ImageBrowser'?'border-color: white;':''}}" ><span class="glyphicon glyphicon-picture"></span> Media</a>
+              </li>
+              {{/if}}
+              
+              <!-- Only SA can update schema-->
+              {{#if _session_user_role == 2}}
+              <li>
+                  <a style="{{selectedModule=='Schema'?'border-color: white;':''}}"><span class="glyphicon glyphicon-tasks"></span> Schema</a>                
+                  <menu>
+                      <menuitem><a style="text-transform: capitalize;" on-click="@this.set('showSchemaNew',true)" id="newSchema" ><span class="glyphicon glyphicon-plus"></span> Add New Schema</a></menuitem>
+                      {{#each sqlite_schema}}                        
+                      <menuitem style="{{(selectedModule=='Schema' && selected_tablename==.name)?'border-color: white;':''}}"><a style="text-transform: capitalize;" on-click="@this.fire('onModuleSelect',@this.event,'Schema', .name)" >{{.name}} ({{.nice_name}})</a></menuitem>
+                      {{/each}}
+                  </menu>
+              </li>            
+              {{/if}}
+  <!--
+              <li>
+                  <a style="{{selectedModule=='TGrid'?'border-color: var(--primary);':''}}">Tables</a>                
+                  <menu>
+                      {{#each sqlite_tables}}
+                      {{#if .is_multiple == 'false'}}
+                      <menuitem style="{{(selectedModule=='TDetailsSingle' && selected_tablename==.name)?'border-color: var(--primary);':''}}"><a style="text-transform: capitalize;" on-click="@this.fire('onModuleSelect',@this.event,'TDetailsSingle', .name)" >{{.nice_name}}</a></menuitem>
+                      {{else}}
+                      <menuitem style="{{(selectedModule=='TGrid' && selected_tablename==.name)?'border-color: var(--primary);':''}}"><a style="text-transform: capitalize;" on-click="@this.fire('onModuleSelect',@this.event,'TGrid', .name)" >{{.nice_name}}</a></menuitem>
+                      {{/if}}
+                      {{/each}}
+                  </menu>
+              </li>       
+  -->            
 
-        
-        <!-- the main navigation items are anchor links within an unordered list -->
-        <ul>
-        
-            <li>
-                <a on-click="@this.set('selectedModule',null)" style="{{!selectedModule?'border-color:white;':''}}" ><span class="glyphicon glyphicon-home"></span> Home</a>
-            </li>
-        
-            <!-- Only SA can usee media -->
-            {{#if _session_user_role == 2}}
-            <li>
-                <a on-click="@this.set('selectedModule','ImageBrowser')" style="{{selectedModule=='ImageBrowser'?'border-color: white;':''}}" ><span class="glyphicon glyphicon-picture"></span> Media</a>
-            </li>
-            {{/if}}
-            
-            <!-- Only SA can update schema-->
-            {{#if _session_user_role == 2}}
-            <li>
-                <a style="{{selectedModule=='Schema'?'border-color: white;':''}}"><span class="glyphicon glyphicon-tasks"></span> Schema</a>                
-                <menu>
-                    <menuitem><a style="text-transform: capitalize;" on-click="@this.set('showSchemaNew',true)" id="newSchema" ><span class="glyphicon glyphicon-plus"></span> Add New Schema</a></menuitem>
-                    {{#each sqlite_schema}}                        
-                    <menuitem style="{{(selectedModule=='Schema' && selected_tablename==.name)?'border-color: white;':''}}"><a style="text-transform: capitalize;" on-click="@this.fire('onModuleSelect',@this.event,'Schema', .name)" >{{.name}} ({{.nice_name}})</a></menuitem>
-                    {{/each}}
-                </menu>
-            </li>            
-            {{/if}}
-<!--
-            <li>
-                <a style="{{selectedModule=='TGrid'?'border-color: var(--primary);':''}}">Tables</a>                
-                <menu>
-                    {{#each sqlite_tables}}
-                    {{#if .is_multiple == 'false'}}
-                    <menuitem style="{{(selectedModule=='TDetailsSingle' && selected_tablename==.name)?'border-color: var(--primary);':''}}"><a style="text-transform: capitalize;" on-click="@this.fire('onModuleSelect',@this.event,'TDetailsSingle', .name)" >{{.nice_name}}</a></menuitem>
-                    {{else}}
-                    <menuitem style="{{(selectedModule=='TGrid' && selected_tablename==.name)?'border-color: var(--primary);':''}}"><a style="text-transform: capitalize;" on-click="@this.fire('onModuleSelect',@this.event,'TGrid', .name)" >{{.nice_name}}</a></menuitem>
-                    {{/if}}
-                    {{/each}}
-                </menu>
-            </li>       
--->            
-
-            <li>
-                <a style="{{selectedModule=='UserList'?'border-color: white;':''}}"><span class="glyphicon glyphicon-cog"></span> Settings</a>                
-                <menu>
-                    {{#if (_session_user_role == 2) || (_session_user_role == 4) || true}} <!--SA and Owner-->
-                    <menuitem style="{{(selectedModule=='UserList')?'border-color: white;':''}}"><a style="text-transform: capitalize;" on-click="@this.fire('onModuleSelect',@this.event,'UserList', '')" >
-                        <span class="glyphicon glyphicon-user">
-                            <span class="glyphicon glyphicon-user" style="position: absolute;left: 5px;top: 1px;color: var(--primary);"></span>
-                        </span> 
-                        Users</a></menuitem>
-                    {{/if}}
-                    <menuitem style="{{(selectedModule=='Login')?'border-color: white;':''}}"><a style="text-transform: capitalize;" on-click="logout" ><span class="glyphicon glyphicon-off"></span> Sign out</a></menuitem>
-                    <menuitem id="showAbout" ><a style="text-transform: capitalize;" on-click="@this.toggle('showAbout')" ><span class="glyphicon glyphicon-info-sign"></span> About</a></menuitem>
-                </menu>
-            </li>       
-                   
-<!--
-            <li on-click="@this.set('selectedModule','settings')"><a style="{{selectedModule=='settings'?'border-color: var(--primary);':''}}">Settings</a></li>            
-            <li on-click="logout" ><a style="{{selectedModule=='Login'?'border-color: var(--primary);':''}}" >Sign out</a></li>        
--->
-        </ul>
-    </label>
-</nav>
-
+              <li>
+                  <a style="{{selectedModule=='UserList'?'border-color: white;':''}}"><span class="glyphicon glyphicon-cog"></span> Settings</a>                
+                  <menu>
+                      {{#if (_session_user_role == 2) || (_session_user_role == 4) || true}} <!--SA and Owner-->
+                      <menuitem style="{{(selectedModule=='UserList')?'border-color: white;':''}}"><a style="text-transform: capitalize;" on-click="@this.fire('onModuleSelect',@this.event,'UserList', '')" >
+                          <span class="glyphicon glyphicon-user">
+                              <span class="glyphicon glyphicon-user" style="position: absolute;left: 5px;top: 1px;color: var(--primary);"></span>
+                          </span> 
+                          Users</a></menuitem>
+                      {{/if}}
+                      <menuitem style="{{(selectedModule=='Login')?'border-color: white;':''}}"><a style="text-transform: capitalize;" on-click="logout" ><span class="glyphicon glyphicon-off"></span> Sign out</a></menuitem>
+                      <menuitem id="showAbout" ><a style="text-transform: capitalize;" on-click="@this.toggle('showAbout')" ><span class="glyphicon glyphicon-info-sign"></span> About</a></menuitem>
+                  </menu>
+              </li>       
+                    
+  <!--
+              <li on-click="@this.set('selectedModule','settings')"><a style="{{selectedModule=='settings'?'border-color: var(--primary);':''}}">Settings</a></li>            
+              <li on-click="logout" ><a style="{{selectedModule=='Login'?'border-color: var(--primary);':''}}" >Sign out</a></li>        
+  -->
+          </ul>
+      </label>
+  </nav>
+{{/if}}
 <!--
                 		
 {{#if selectedModule && selectedModule != 'settings'}}
@@ -88,8 +87,7 @@
 -->
 
 {{#if !is_logedin}}
-<modal show="{{true}}" title="Login" 
-zoomFrom="nav" showOverlay="{{true}}" showHeader="{{true}}" style="
+<modal show="{{true}}" title="Login" showOverlay="{{true}}" showHeader="{{true}}" style="
 height: 20em;
 width: 30em;
 left: calc(50% - 15em);
@@ -152,7 +150,7 @@ bottom: inherit;
 
 {{#if showAbout }}
 <modal show="{{showAbout}}" zoomFrom="showAbout" title="About" 
-class="animated fadeInRight" showOverlay="{{false}}" showHeader="{{true}}" style="
+class="animated fadeInRight" showOverlay="{{true}}" showHeader="{{true}}" style="
 height: 20em;
 width: 30em;
 left: calc(50% - 15em);
@@ -175,30 +173,50 @@ right: inherit;
 top: calc(50% - 8em);
 bottom: inherit;
 " >
-    <section style="padding: 2rem; overflow: auto; text-align: center;height: 100%; display: flex; flex-flow: column;">
-        <h3 style="flex:1; overflow: auto; overflow-wrap: break-word;">{{YesNoDialogText}}</h3>
-        <div xx style="display:flex; justify-content: space-between; margin-top: 0;">
-            <button  style="margin: 0;" on-click="@this.fire('YesNoDialogAnswer', false)">
-                <span class="glyphicon glyphicon-remove"></span> Cancel
-            </button>    
-            <button primary style="width: 14rem; margin: 0;" on-click="@this.fire('YesNoDialogAnswer', true)">
-                <span class="glyphicon glyphicon-ok"></span>
-                Yes
-            </button>    
-        </div>
-    </section>
+  <section style="padding: 2rem; overflow: auto; text-align: center;height: 100%; display: flex; flex-flow: column;">
+    <h3 style="flex:1; overflow: auto; overflow-wrap: break-word;">{{YesNoDialogText}}</h3>
+    <div xx style="display:flex; justify-content: space-between; margin-top: 0;">
+        <button  style="margin: 0;" on-click="@this.fire('YesNoDialogAnswer', false)">
+            <span class="glyphicon glyphicon-remove"></span> Cancel
+        </button>    
+        <button primary style="width: 14rem; margin: 0;" on-click="@this.fire('YesNoDialogAnswer', true)">
+            <span class="glyphicon glyphicon-ok"></span>
+            Yes
+        </button>    
+    </div>
+  </section>
 </modal>
 {{/if}}
 
-
+{{#if init}}
+<modal show="{{true}}" title="First time here ?" showOverlay="{{true}}" showHeader="{{true}}" style="
+height: 22em;
+width: 30em;
+left: calc(50% - 15em);
+right: inherit;
+top: calc(50% - 11em);
+bottom: inherit;
+" >
+    <Init G={{.}} ></Init>
+</modal>
+{{/if}}
 
 <script>
   component.exports = {
     onrender: function () {
         var self = this;
 
+        async function has_users(){
+          var [resp,err] = await fetch2("?query=has_users")
+          if(resp && resp.usrs=='0'){
+            if (self.get('is_logedin')) self.fire('logout');
+            self.set('init', true)
+          }
+        }
+        has_users()
+
         this.on('refresh', async function(){
-            //console.log('refreshing sqlite tables')
+            //console.log('refreshing sqlite tables')            
             var [resp,err] = await fetch2("?query=_cms_tables_list_get")
             if (resp) self.set('sqlite_tables', resp)
             if (resp) self.set('sqlite_schema', resp)
@@ -275,7 +293,8 @@ bottom: inherit;
                 menuOpen:false,
                 showAbout:false,
                 showYesNoDialog:false,
-                YesNoDialogText:''
+                YesNoDialogText:'',
+                init:false
 
             }
         }

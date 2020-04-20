@@ -1,0 +1,56 @@
+
+<section style="flex:1; padding-bottom:0; padding:1rem; overflow:auto">
+  <h3 style="margin-bottom: 1rem;">Create user</h3>
+  <label>Email</label>
+  <input type="text" placeholder="username" value={{email}} >
+  
+  <label>Password</label>
+  <input type="password" placeholder="password" value={{password}}>
+  
+  <button  primary m-full style="width: 100%; margin: 0;" on-click="insertUser">Create new user
+  </button>    
+
+</section>
+
+
+<script>
+component.exports = {
+  onrender: async function () {
+      var self = this;
+      /*
+      this.focusFirstElement();
+      var [resp,err] = await fetch2('?query=_authCheck');
+      if (resp && resp._session_user_name) {
+          izitoast.success({ message: 'Welcome back, '+resp._session_user_name}); 
+          self.set('G._session_user_name', resp._session_user_name);
+          self.set('G._session_user_role', resp._session_user_role);
+          self.set('G.is_logedin',true);
+      }
+      */
+      this.on('insertUser', async function(){
+          var email = self.get('email');
+          var password = self.get('password');
+          
+          var [resp,err] = await fetch2('?query=has_users&_action=insert', {user_name:email, password:password})
+          if (resp) {
+              izitoast.success({ message: 'User added'}); 
+              //self.set('G._session_user_name', resp._session_user_name);
+              //self.set('G._session_user_role', resp._session_user_role);
+              self.set('G.init', false);
+          } else izitoast.error({ message: 'Error'});                
+
+      })
+
+  },        
+  data:function() {
+          return {
+              G:null
+              , email:null
+              , password:null
+          }
+      }
+
+};
+</script>
+
+

@@ -1,12 +1,12 @@
 
 <section style="flex:1; padding-bottom:0; padding:1rem; overflow:auto">
-    <label>Username</label>
+    <label>Email</label>
     <input type="text" placeholder="email" value={{email}} >
     
     <label>Password</label>
     <input type="password" placeholder="password" value={{password}}>
     
-    <button  primary m-full style="width: 100%; margin: 0;" on-click="tryLogin">Sign in
+    <button disabled={{disabled}} primary m-full style="width: 100%; margin: 0;" on-click="tryLogin">Sign in
     </button>    
 
 </section>
@@ -29,13 +29,15 @@
             var email = self.get('email');
             var password = self.get('password');
             console.log('tryLogin')
+            self.set('disabled', true);
             var [resp,err] = await fetch2('?query=_authSA', {email:email, password:password})
+            self.set('disabled', false);
             if (resp && resp._session_user_name) {
                 izitoast.success({ message: 'You are in'}); 
                 self.set('G._session_user_name', resp._session_user_name);
                 self.set('G._session_user_role', resp._session_user_role);
                 self.set('G.is_logedin',true);
-            } else izitoast.error({ message: 'Wrong credentials'});                
+            } else izitoast.error({ message: (resp && resp.message)?resp.message:'Wrong credentials'});                
 
         })
     },        
@@ -44,6 +46,7 @@
                 G:null
                 , email:null
                 , password:null
+                , disabled: false
             }
         }
 

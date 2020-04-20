@@ -1,7 +1,7 @@
-{{#if showOverlay}}
+{{#if showOverlayTRUE}}
 <div class="roverlay" on-tap="cmdCloseOnBackgroundTap" id="roverlay" style="opacity:{{opacity}}"></div>
 {{/if}}
-<div class="modal rmodal {{!showOverlay?'rmodalShowOverlay':''}} {{class}}" 
+<div class="modal rmodal {{!showOverlayTRUE?'rmodalShowOverlay':''}} {{class}}" 
 style="{{style}}; {{#if left!==null}}left:{{left}}px; top:{{top}}px;{{/if}} opacity:{{opacity}}" 
 id="rmodalm" >
 
@@ -377,7 +377,9 @@ id="rmodalm" >
         data:function() { 
             return { 
                 show:false, closeOnBackgroundTap:true, title:null, opacity:1
-                , left:null, top:null, showOverlay:true
+                , left:null, top:null
+                , showOverlay:true
+                , showOverlayTRUE:true // True hardcoded               
                 , isFullScreen:false
                 , offsetWidth: 1000, cw:5, zoomFrom:null, zoomFromLeft:-100, zoomFromTop:-100
                 , showHeader:true

@@ -39,9 +39,27 @@ if ($req['query'] == '_authSA'){
   }
 
 
-  //echo json_encode()
+  if ( !isset($_SESSION['_login_attempts']) ) $_SESSION['_login_attempts'] = 0;
+  ++$_SESSION['_login_attempts'];
+  if ( !isset($_SESSION['_login_ts']) ) $_SESSION['_login_ts'] = 0;
+
+  $login_timeout_minutes = 10;
+  $login_attempts_max = 9;
+  $current_time = time();
+  // reset counter after 60sec
+  if ( ($current_time - $_SESSION['_login_ts']) >= $login_timeout_minutes*60  )
+    $_SESSION['_login_attempts'] = 1;
+
+  if ( ($current_time - $_SESSION['_login_ts']) < $login_timeout_minutes*60 && ($_SESSION['_login_attempts']> $login_attempts_max) ){
+    sleep(2);
+    echo json_encode(array('message'=>"Too many login attempts. Please try again in $login_timeout_minutes min"));
+    return;
+  }
+  $_SESSION['_login_ts'] = $current_time;
+  
   $resp = fetch('_authSA', $req);
   if ( $resp == new stdClass() ){
+    sleep(1);
     echo json_encode(array('message'=>'Wrong credentials'));
     return;
   }

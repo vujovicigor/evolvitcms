@@ -25,11 +25,11 @@
 {{#if showDetails}}
 <modal show="{{showDetails}}"  cw="{{cw}}" title="{{G.schemas[~/selected_tablename].nice_name}} details" 
 class="animated fadeInRight" showOverlay="{{false}}" style="
-height: 44em;
-width: 50em;
-left: calc(50% - 25em);
+height: min(44em, calc(100vh - 60px) );
+width: min(64em, 100vw);
+left: calc(50% - min(64em, 100vw)/2);
 right: inherit;
-top: calc(50% - 22em);
+top: calc(50% - min(44em, 100vh - 120px)/2);
 bottom: inherit;" >
     <TDetails row={{row}} parent_id={{parent_id}} update={{true}} cols={{columns}} show="{{showDetails}}" tablename={{selected_tablename}}></TDetails>
 </modal>
@@ -37,11 +37,11 @@ bottom: inherit;" >
 
 {{#if addNew}}
 <modal show="{{addNew}}"  cw="{{cw}}" title="Add new {{G.schemas[~/selected_tablename].nice_name}}" showOverlay="{{true}}" style="
-height: 44em;
-width: 50em;
-left: calc(50% - 25em);
+height: min(44em, calc(100vh - 60px) );
+width: min(64em, 100vw);
+left: calc(50% - min(64em, 100vw)/2);
 right: inherit;
-top: calc(50% - 22em);
+top: calc(50% - min(44em, 100vh - 120px)/2);
 bottom: inherit;" >
     <TDetails show="{{addNew}}" parent_id={{parent_id}} update={{false}} cols={{columns}} tablename={{selected_tablename}}></TDetails>
 </modal>

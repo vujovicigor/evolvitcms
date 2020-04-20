@@ -47,6 +47,17 @@ $twig = new Twig_Environment($loader, array(
     'cache' => 'twigcache',
     'auto_reload' => true
 ));
+//$twig->addFilter('var_dump', new Twig_Filter_Function('var_dump'));
+
+$vd = new Twig_SimpleFunction('dump', function ($mixed) {
+  ob_start();
+  var_dump($mixed);
+  $content = ob_get_contents();
+  ob_end_clean();
+  return $content;
+});
+$twig->addFunction($vd);
+
 
 $f = new Twig_SimpleFunction('fetch', function ($name, $params=array()) {
   return fetch($name, $params);

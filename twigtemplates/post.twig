@@ -8,27 +8,27 @@
   {% if Post.Image %} <img src="img/{{Post.Image}}"> {% endif %}
   <div style="margin-top: 1rem;" >{{Post.Body | raw}} </div> 
 
-  {% set Comment = fetch("Comment") %}
+  {% set Comment = fetch("CommentByPostId", {PostId:Post.id}) %}
   <h2>Comment</h2>
-  <table border=1 style="width:100%">
+  <table border=1 style="width:100%" id="commentsTable">
   <tr>
-    <td>id</td>
-    <td>PostId</td>
+<!--    <td>id</td> -->
+    <td>Img</td>
     <td>PostId</td>
     <td>Text</td>
     <td>Author</td>
-    <td>ParentCommentId</td>
-    <td>ParentCommentId</td>
+<!--    <td>ParentCommentId</td>
+    <td>ParentCommentId</td> -->
   </tr>
   {% for item in Comment %}
   <tr>
-    <td> {{item.id}} </td>
-    <td> {{item.PostId}} </td>
+<!--    <td> {{item.id}} </td> -->
+    <td> <img src="{{item.google_user_picture}}"> </td>
     <td> {{item.PostId_label}} </td>
     <td> {{item.Text}} </td>
-    <td> {{item.Author}} </td>
-    <td> {{item.ParentCommentId}} </td>
-    <td> {{item.ParentCommentId_label}} </td>
+    <td> {{item.google_user_given_name}} </td>
+<!--    <td> {{item.ParentCommentId}} </td>
+    <td> {{item.ParentCommentId_label}} </td> -->
   </tr>
   {% endfor %}
   </table>
@@ -46,7 +46,6 @@
 
   
   <script>
-
     // Google auth
     var GoogleUserData = {}
     function onSuccess(googleUser) {
@@ -99,18 +98,43 @@
     for(var i in data){
       fd.append(i,data[i]);
     }
+{% verbatim %}
 
     var xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
     xhr.open('POST', 'cms/postComment.php', true);
     //xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function(resp) {
-      console.log(resp)
+//      console.log(resp)
+      var newPostHtmlContent= t(`  
+  <tr>
+    <td> {{id}} </td>
+    <td> {{PostId}} </td>
+    <td> {{PostId_label}} </td>
+    <td> {{Text}} </td>
+    <td> {{Author}} </td>
+    <td> {{ParentCommentId}} </td>
+    <td> {{ParentCommentId_label}} </td>
+  </tr>`, xhr.response)
+      console.log(xhr.response, newPostHtmlContent)
+
+      var myHtmlContent = "<h3>hello</h3>"
+      var tableRef = document.getElementById('commentsTable').getElementsByTagName('tbody')[0];
+
+      var newRow = tableRef.insertRow(tableRef.rows.length);
+      newRow.innerHTML = newPostHtmlContent;
 
     };
     xhr.send(fd);   
-
-
   }
+
+
+  function t(s,d){
+  for(var p in d)
+    s=s.replace(new RegExp('{{'+p+'}}','g'), d[p]);
+  return s;
+  }
+{% endverbatim %}  
 
   </script>
 

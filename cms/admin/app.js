@@ -55,7 +55,7 @@ window.fetch2 = function(url, obj){
   var body = new FormData()
   if (obj)
       Object.keys(obj).forEach(function(key) {
-        var tmpObj = obj[key]===null?'':obj[key]
+        var tmpObj = (typeof obj[key] === 'undefined' || obj[key]===null)?'':obj[key]
         if (typeof tmpObj == 'object') tmpObj=JSON.stringify(tmpObj)
         body.append(key, tmpObj)
       });
@@ -313,6 +313,7 @@ Ractive.components.Cropper                  =  require('./Cropper.html');
 //Ractive.components.Gallery                  =  require('./Gallery.html');
 Ractive.components.Gallery                  =  require('./Gallery2.html');
 Ractive.components.Gallery2single           =  require('./Gallery2single.html');
+Ractive.components.Init           =  require('./Init.html');
 
 //document.addEventListener("deviceready", onDeviceReady, false);
 //if (!window.cordova) onDeviceReady()

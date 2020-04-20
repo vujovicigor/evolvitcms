@@ -1,9 +1,10 @@
-<section xx style="padding-bottom:0; padding-top:2rem; display:flex; flex-flow: column; flex:1; max-width: unset;">
+<section xx style="padding-bottom:0; padding-top:2rem; display:flex; flex-flow: column; flex:1; overflow: auto;">
     <div style="display:flex;">
         <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Info'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Info')" >Info</button>
         <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Fields'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Fields')" >Fields</button>
         <button class="tabz" xx style="border-bottom-color:{{selectedTab=='PHP'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','PHP')" >PHP Template</button>
         <button class="tabz" xx style="border-bottom-color:{{selectedTab=='TWIG'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','TWIG')" >TWIG Template</button>
+        <button style="margin-left: auto;" on-click="@this.set('showSchemaFiledAdd',true)" >Add new field</button>
 <!--
         <button class="tabz" xx style="border-bottom-color:{{selectedTab=='List View'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','List View')" >List View</button>
         <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Detail View'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Detail View')" >Detail View</button>
@@ -25,7 +26,7 @@
 
     <!-- Info -->
     {{#if selectedTab=='Info'}}
-    <div style="flex:1; overflow: auto;">
+    <div style="flex:1; overflow-x: hidden; overflow-y: auto;">
         <grid style="flex:1; overflow:auto;">
             <div col='1/1'>
                 <label style="width: 14rem;">Schema name</label>
@@ -96,23 +97,28 @@
     <!-- Fields -->
     {{#if selectedTab=='Fields'}}
     <div style="flex:1; overflow: auto;">
-        <button on-click="@this.set('showSchemaFiledAdd',true)" > Add new field</button>
         <table>
             <thead>
                 <tr>
                     <th>Field name</th>
                     <th>Nice name</th>
                     <th>Type</th>
+<!--
                     <th>Placeholder</th>
                     <th>Tooltip</th>
+-->                    
                     <th>Sort</th>
+<!--                    
                     <th>Default value</th>
                     <th>Lookup table</th>
                     <th>Lookup field</th>
+-->                    
                     <th>Show on grid</th>
                     <th>Show on details</th>
+<!--
                     <th>Searchable</th>
                     <th>Width</th>
+-->                    
                 </tr>
             </thead>
             <tbody>
@@ -121,12 +127,16 @@
                     <td>{{.field_name}}</td>
                     <td>{{.nice_name}}</td>
                     <td>{{.field_type}}</td>
+<!--
                     <td>{{.placeholder}}</td>
                     <td>{{.tooltip}}</td>
+-->                    
                     <td>{{.field_sort}}</td>
+<!--                    
                     <td>{{.default_value}}</td>
                     <td>{{.lookup_table}}</td>
                     <td>{{.lookup_field}}</td>
+-->                    
                     <td>
                         {{#if .visible === 'true' }}
                             <i class="glyphicon glyphicon-ok green"></i>
@@ -143,6 +153,7 @@
                             <i class="glyphicon glyphicon-remove red"></i>
                         {{/if}}
                     </td>
+<!--                    
                     <td>
                         {{#if .filter === 'true' }}
                             <i class="glyphicon glyphicon-ok green"></i>
@@ -152,6 +163,7 @@
                         {{/if}}
                     </td>
                     <td>{{.w}}</td>
+-->                    
                 </tr>
                 {{/each}}
             </tbody>

@@ -3,7 +3,7 @@
             <tag>{{fr.length}} user{{fr.length==1?'':'s'}}</tag>
         </span>      
         <span style="flex: 1; text-align: center; font-weight: bold; text-transform: uppercase;">
-            {{.selected_tablename}}
+            Users
         </span>
         <button style="padding: 9px; margin: 0;" on-click="@this.set('addNew',true)" id="addNew">
             <span class="glyphicon glyphicon-plus"></span>
@@ -83,10 +83,10 @@
                         , addNew:false 
                         , selected_tablename:'_user'   
                         , columns:[
-                            {"default_value":"","compId":"user_name","compType":"TEXT","label":"user_name","field_name":"user_name","field_sort":"10","field_type":"TEXT","lookup_field":"","lookup_table":"","nice_name":"user_name","placeholder":"","table_name":"user","tooltip":"","visible":"true","visible_details":"true","filter":"true","template":""}
-                            ,{"default_value":"","compId":"user_pass","compType":"PASS","label":"user_pass","field_name":"user_pass","field_sort":"20","field_type":"TEXT","lookup_field":"","lookup_table":"","nice_name":"user_pass","placeholder":"","table_name":"user","tooltip":"","visible":"false","visible_details":"true","filter":"true","template":""}
-                            ,{"default_value":"","compId":"user_role","compType":"DROPDOWN","label":"user_role","field_name":"user_role","field_sort":"30","field_type":"DROPDOWN","lookup_field":"name","lookup_table":"_role","nice_name":"user_role","placeholder":"","table_name":"user","tooltip":"","visible":"false","visible_details":"true","filter":"true","template":""}
-                            ,{"default_value":null,"compId":"user_role_label","compType":"TEXT","label":"user_role","field_name":"user_role_label","field_sort":"30","field_type":"TEXT","lookup_field":null,"lookup_table":null,"nice_name":"user_role","placeholder":null,"table_name":"user","tooltip":null,"visible":"true","visible_details":"false","filter":"true","template":null}
+                            {"default_value":"","compId":"user_name","compType":"TEXT","label":"EMAIL","field_name":"user_name","field_sort":"10","field_type":"TEXT","lookup_field":"","lookup_table":"","nice_name":"EMAIL","placeholder":"","table_name":"user","tooltip":"","visible":"true","visible_details":"true","filter":"true","template":""}
+                            ,{"default_value":"","compId":"user_pass","compType":"PASS","label":"PASSWORD","field_name":"user_pass","field_sort":"20","field_type":"TEXT","lookup_field":"","lookup_table":"","nice_name":"PASSWORD","placeholder":"","table_name":"user","tooltip":"","visible":"false","visible_details":"true","filter":"true","template":""}
+                            ,{"default_value":"4","compId":"user_role","compType":"DROPDOWN","label":"ROLE","field_name":"user_role","field_sort":"30","field_type":"DROPDOWN","lookup_field":"name","lookup_table":"_role","nice_name":"ROLE","placeholder":"","table_name":"user","tooltip":"","visible":"false","visible_details":"true","filter":"true","template":""}
+                            ,{"default_value":null,"compId":"user_role_label","compType":"TEXT","label":"ROLE","field_name":"user_role_label","field_sort":"30","field_type":"TEXT","lookup_field":null,"lookup_table":null,"nice_name":"ROLE","placeholder":null,"table_name":"user","tooltip":null,"visible":"true","visible_details":"false","filter":"true","template":null}
                         ]  
       /*
                          , columns: [
