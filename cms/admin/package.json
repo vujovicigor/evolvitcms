@@ -15,7 +15,7 @@
     "hammerjs": "^2.0.8",
     "izitoast": "^1.4.0",
     "jotform-css.js": "^1.0.1",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "net": "^1.0.2",
     "ractive": "^0.8.14",
     "ractive-decorators-sortable": "^0.2.1",
