@@ -45,7 +45,7 @@
             click: function () {
             // invoke insertText method with 'hello' on editor module.
               $('#summernote').summernote('editor.saveRange');
-              console.log('child win', window)
+              //console.log('child win', window)
 //              top.document.summernoteframe1.set('showFileBrowse',true);
               PARENT.set('showFileBrowse',true);
 
@@ -64,7 +64,7 @@
           click: function () {
           // invoke insertText method with 'hello' on editor module.
             //$('#summernote').summernote('editor.saveRange');
-            console.log('toggle SpeechRecognition')
+            //console.log('toggle SpeechRecognition')
             if (!recognition) startMic()
             else stopMic();
             //context.invoke('editor.insertText', 'Image odje');
@@ -106,7 +106,7 @@
         //dialogsInBody: true,
         callbacks: {
             onInit: function(e) {
-              console.log('onInit summer')
+              //console.log('onInit summer')
               window.summerReady = true
               //$("#summernote").summernote("fullscreen.toggle");
             },
@@ -199,7 +199,7 @@
   recognition = null;
   curr = null;
   function stopMic(){
-    console.log('stop mic')
+    //console.log('stop mic')
     recognition.stop()
     recognition = null;
     hideInerim();
@@ -269,7 +269,7 @@
 
     recognition.onend = function() {
       recognizing = false;
-      console.log('recognition.onend');
+      //console.log('recognition.onend');
       $('.note-icon-pencil').parent().css('color','#333')
       
       hideInerim();
@@ -331,7 +331,7 @@
       }
       if (final_transcript) {
         final_transcript = capitalize(final_transcript);
-        console.log('final: ', final_transcript)
+        //console.log('final: ', final_transcript)
         hideInerim();
 
           //$('#summernote').summernote('editor.restoreRange');
@@ -358,7 +358,7 @@
       }
       if (interim_transcript) {
         interim_transcript = capitalize(interim_transcript);
-        console.log('i', interim_transcript);
+        //console.log('i', interim_transcript);
         showInerim(interim_transcript)
         //$('#interim').text(interim_transcript)
   //      cc.set('interim_transcript', interim_transcript)

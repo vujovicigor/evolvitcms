@@ -1,0 +1,293 @@
+<section xx class="componentSection">
+        <grid style="flex:1; overflow:auto;">
+            {{#each cols}}
+    
+            {{#if .compType=='TEXT' && .visible_details=='true'}}
+            <div col='1/1' class="f" xx>
+                <label class="l" xx>{{.nice_name}}</label>
+                <input style="width: calc(100% - 15rem)" type="text" title="{{.tooltip}}" placeholder="{{.placeholder}}" value={{row[.compId]}}  >
+            </div>
+            {{/if}}
+    
+            {{#if .compType=='LONGTEXT' && .visible_details=='true'}}
+            <div col='1/1' class="f" xx>
+                <label class="l" xx>{{.nice_name}}</label>
+                <textarea style="width: calc(100% - 15rem)" style="min-height: 14rem;" title="{{.tooltip}}" placeholder="{{.placeholder}}" value={{row[.compId]}}  >
+            </div>
+            {{/if}}
+            
+            {{#if (.compType=='INTEGER' || .compType=='NUMERIC') && .visible_details=='true' }}
+            <div col='1/1' class="f" xx>
+                <label class="l" xx>{{.nice_name}}</label>
+                <input style="width: calc(100% - 15rem)" type="number" title="{{.tooltip}}" placeholder="{{.placeholder}}" value={{row[.compId]}} >
+            </div>
+            {{/if}}
+    
+            {{#if .compType=='DATE' && .visible_details=='true'}}
+            <div col='1/1' class="f" xx>
+                <label class="l" xx>{{.nice_name}}</label>
+                <input style="width: calc(100% - 15rem)" type="date" title="{{.tooltip}}" placeholder="{{.placeholder}}" value={{row[.compId]}}  >
+            </div>
+            {{/if}}
+    
+            {{#if .compType=='COLOR' && .visible_details=='true'}}
+            <div col='1/1' class="f" xx>
+                <label class="l" xx>{{.nice_name}}</label>
+                <input style="width: 8rem" type="text" style="height:3.6rem" title="{{.tooltip}}" placeholder="{{.placeholder}}" value={{row[.compId]}}  >
+                <input style="width: calc(100% - 23rem)" type="color" style="height:4rem" title="{{.tooltip}}" placeholder="{{.placeholder}}" value={{row[.compId]}}  >
+            </div>
+            {{/if}}
+    
+            {{#if .compType=='MULTISELECT' && .visible_details=='true'}}
+            <div col='1/1'  class="f" xx >
+                <label class="l" xx>{{.nice_name}}</label>
+                <Selectize url="?query={{.lookup_table}}" value="{{row[.compId]}}" labelf="{{.lookup_field}}" 
+                    multiple="multiple" style="display: inline-block; width: calc(100% - 15rem)"  > 
+                </Selectize>
+            </div>
+            {{/if}}
+            
+            {{#if .compType=='IMAGE' && .visible_details=='true' && !((.compId).endsWith('_')) }}
+<!--
+        <div col='1/1'  class="f" xx>
+            <label class="l" xx>{{.nice_name}}</label>
+            <input style="width: calc(100% - 39rem); margin-right: 1rem;" type="text" title="{{.tooltip}}" placeholder="{{.placeholder}}" value={{row[.compId]}}>
+            <button id="browse" style="width: 14rem;" on-click="@this.fire('showFileBrowse', .compId, .aspect_ratio)">Browse
+            </button>    
+            <img src="{{HOSTNAME}}image.php?id={{row[.compId]}}&forcethumb" alt="{{row[.compId]}}" style="max-width: 8rem; max-height: 6rem;">
+        </div>
+-->
+            <div col='1/1' class="f" xx>
+              <label class="l" xx>{{.nice_name}}</label>
+              <Gallery2single slug={{row[.compId]}} aspect_ratio={{.aspect_ratio}} />
+            </div>
+            {{/if}}
+
+            {{#if .compType=='IMAGE' && .visible_details=='true' && (.compId).endsWith('_') }}
+            <div col='1/1' class="f" xx>
+              <label class="l" xx>{{.nice_name}}</label>
+              <Gallery rows={{row[.compId]}} aspect_ratio={{.aspect_ratio}} />
+            </div>
+            {{/if}}
+
+            
+            {{#if .compType=='DROPDOWN' && .visible_details=='true'}}
+            <div col='1/1' class="f" xx>
+                <label class="l" xx>{{.nice_name}}</label>
+                <Select style="display: inline-block; width: calc(100% - 15rem)" url="?query={{.lookup_table}}" value={{row[.compId]}} labelf="{{.lookup_field}}" valuef="id" >
+                    <option disabled selected value="" >Pick</option>
+                </Select>          
+            </div>
+            {{/if}}
+    
+            {{#if .compType=='GPS' && .visible_details=='true'}}
+            <div col='1/1' class="f" xx>
+                <label class="l" xx>{{.nice_name}}</label>
+                <input style="width: calc(100% - 23rem)" type="text" title="{{.tooltip}}" placeholder="{{.placeholder}}" value={{row[.compId]}}  >
+                <button style="float:right" on-click="@this.fire('showMap', .compId)">Map</button>
+            </div>
+            {{/if}}
+    
+            {{#if .compType=='CHECKBOX' && .visible_details=='true'}}
+            <div col='1/1' class="f" xx>
+                <Checkbox id="{{compId}}" checked={{row[.compId]}}></Checkbox>
+                <label for="{{compId}}">{{.nice_name}}</label>
+            </div>
+            {{/if}}
+    
+            {{#if .compType=='HTMLEDIT' && .visible_details=='true'}}
+            <div col='1/1' class="f" xx>
+                <label class="l" xx>{{.nice_name}}</label>
+                <HtmlEdit style="width: calc(100% - 15rem) height:30rem" placeholder="{{.placeholder}}" code={{row[.compId]}} >
+                </HtmlEdit>
+            </div>
+            {{/if}}
+    
+            {{#if .compType=='RANGE' && .visible_details=='true'}}
+            <div col='1/1' class="f" xx>
+                <label class="l" xx>{{.nice_name}}</label>
+                <input style="width: calc(100% - 15rem)" type="range" title="{{.tooltip}}" placeholder="{{.placeholder}}" value={{row[.compId]}}  >
+            </div>
+            {{/if}}
+    
+            <!--            
+                {{#if .type=='TEXT' && .name != 'sql_select'}}
+                <div col='1/1'>
+                    <label>{{.name}}</label>
+                    <input type="text" value={{row[.name]}}  >
+                </div>
+                {{/if}}
+    
+                {{#if .type=='TEXT' && .name == 'sql_select'}}
+                <div col='1/1'>
+                    <label>{{.name}}</label>
+                    <textarea style="min-height: 14rem;" value={{row[.name]}}  >
+                </div>
+                {{/if}}
+                
+    
+                {{#if .type=='INTEGER' }}
+                <div col='1/1'>
+                    <label>{{.name}}</label>
+                    <input type="number" value={{row[.name]}} >
+                </div>
+                {{/if}}
+    
+    
+                {{#if .type!='INTEGER' && .type!='TEXT' }}
+                <div col='1/1'>
+                    <label>{{.name}}</label>
+                    <input type="text" value={{row[.name]}} >
+                </div>
+                {{/if}}
+    -->
+            {{/each}}
+        </grid>
+        <div xx class="buttonBar">
+            <button style="visibility: hidden;" disabled="{{!row.id || loading}}" on-click="delete">
+                <span class="glyphicon glyphicon-remove"></span> Delete
+            </button>    
+            <button primary disabled={{loading}} style="width: 14rem;" on-click="save">
+                <span class="glyphicon {{loading?'glyphicon-refresh glyphicon-refresh-animate':'glyphicon-ok'}}"></span>
+                 Save
+            </button>    
+        </div>
+    
+    <!--
+        <button id="browse" style="width: 14rem;" on-click="@this.set('showModal',true)">Browse
+        </button>    
+    -->                
+    </section>
+
+{{#if showMap}}
+<modal show="{{showMap}}" title="Click on map to set position" 
+class="animated fadeInRight" showOverlay="{{true}}" showHeader="{{true}}" style="
+height: 40em;
+width: 60em;
+left: calc(50% - 30em);
+right: inherit;
+top: calc(50% - 20em);
+bottom: inherit;
+" >
+    <map G={{.}} gps="{{row[mapvarname]}}" show="{{showMap}}"></map>
+</modal>  
+{{/if}}   
+
+
+{{#if showFileBrowse}}
+<modal show="{{showFileBrowse}}" zoomFrom="browse" cw="{{cw}}" title="Browse" 
+class="animated fadeInRight" showOverlay="{{true}}" style="
+height: 44em;
+width: 50em;
+left: calc(50% - 25em);
+right: inherit;
+top: calc(50% - 22em);
+bottom: inherit;" >
+    <ImageBrowser path="{{row[pathvarname]}}" show="{{showFileBrowse}}"></ImageBrowser>
+</modal>
+{{/if}}
+
+<style>
+.l{
+    width:14rem;
+}
+.f {
+    display: flex;
+    align-items: center;
+}
+.componentSection {
+    flex:1; 
+    padding-bottom:0; 
+    padding:1rem; 
+    overflow:auto; 
+    display:flex; 
+    flex-flow:column; 
+    height:100%;
+    max-width: unset;
+}
+.buttonBar{
+    display:flex; 
+    justify-content: space-between; 
+    margin-top: 2rem;
+}
+
+</style>
+<script>
+    component.exports = {
+    onrender: function () {
+        var self = this;
+        self.set('HOSTNAME', HOSTNAME);
+        TDetails = self;
+        //console.log('in TDetailsSingle')
+
+        this.on('refresh', async function(){
+            var selected_tablename = self.get('selected_tablename');
+            //console.log('refreshing ' + selected_tablename);
+            self.set('loading', true)
+            //TODO
+            var [columns, err] = await fetch2("?query=_engine_schema_column&table_name="+selected_tablename)
+            var [resp,err] = await fetch2('?query='+ selected_tablename)
+            self.set('loading', false)
+            if (columns) self.set('cols', columns);
+            if (resp) self.set('row', resp);
+            setTimeout( function() { self.focusFirstElement(self) }, 1);
+        })
+        this.fire('refresh')
+        
+        if (false || !self.get('update')){
+            // set default values from columns definition
+            var cols = self.get('cols');
+            var row = {};
+            for(var i=0;i<cols.length;i++) {
+                //row[ cols[i].compId ] = cols[i].default_value;
+                try{
+                  row[ cols[i].compId ] = eval( cols[i].default_value )
+                }
+                catch(e){
+                  row[ cols[i].compId ] = cols[i].default_value;
+                }
+
+                if (cols[i].default_value == 'now' && cols[i].compType == 'DATE')
+                    row[ cols[i].compId ] = new Date().toISOString().substr(0, 10);
+            }
+            self.set('row', row);
+        }
+
+        this.on('save', async function(){
+            var row = self.get('row');
+            var [resp, err] = await self.fetch2('?query='+self.get('selected_tablename')+'&_action='+(self.get('row.id')?'update':'insert') , row);
+            if (resp) {
+                izitoast.success({ message: 'Record saved.'});
+                if (self.parent) self.parent.fire('refresh');
+                self.set('show', false);
+                ractive.set('selectedModule',null);
+            }
+        })
+    
+        this.on('showMap', function(id){
+            //console.log(id);
+            self.set('mapvarname', id)
+            self.set('showMap', true)
+        })
+
+        this.on('showFileBrowse', function(id){
+            //console.log(id);
+            self.set('pathvarname', id)
+            self.set('showFileBrowse', true)
+        })
+        
+    },        
+    data:function() {
+            return {
+                  row:{}
+                , columns:[]
+                , selected_tablename:null
+                , cols:[]
+                , update:null
+                , mapvarname:''
+            }
+        }
+    };
+</script>
+
+

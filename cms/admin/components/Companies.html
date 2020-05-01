@@ -1,0 +1,136 @@
+<section style="padding-bottom:0; padding-top:8px; display:flex; flex-flow: row; justify-content:space-between">
+    <span style="font-weight: bold">
+        Companies <tag>{{fr.length}}</tag>
+    </span>    
+    <span style="font-weight: bold">
+        Constructions <tag>{{construction_total}}</tag>
+    </span>
+    <span style="font-weight: bold">
+        Users <tag>{{users_total}}</tag>
+    </span>    
+    <button style="padding: 9px; margin: 0;" on-click="@this.set('addNewCompany',true)" id="addNewCompany">Create New Company</button>
+</section>
+
+<section style="flex:1; padding-bottom:1rem; padding-top:0; overflow:auto">
+    <div id="testbtn" style="display:box; display:flex; height:100%; overflow:auto; flex:1">
+        <f2table style="width:100%" rows={{rows}} visible="true" headerFixedHeight={{false}} alternateColor="{{true}}" 
+            columns={{columns}} ipp="50" refresh={{refresh}} fr={{fr}} row={{row}}
+            variableRowHeight={{false}} showSearch={{true}} showPaginator={{true}} showHeaders={{true}} selectid={{selectid}} loading={{loading}} nodata={{false}} >
+        </f2table>
+    </div>
+</section>
+
+
+{{#if showModal}}
+<modal show="{{showModal}}" zoomFrom="{{currFilterIndex}}" cw="{{cw}}" title="Company details" 
+class="animated fadeInRight" showOverlay="{{false}}" style="
+height: initial;
+width: auto;
+left: 50%;
+right: 0;
+top: 5rem;
+bottom: 0;" >
+    <Company row={{row}}></Company>
+</modal>
+{{/if}}
+
+{{#if addNewCompany}}
+<modal show="{{addNewCompany}}" zoomFrom="addNewCompany" cw="{{cw}}" title="Create new company" showOverlay="{{true}}" style="
+height: 44em;
+width: 50em;
+left: calc(50% - 25em);
+right: inherit;
+top: calc(50% - 22em);
+bottom: inherit;" >
+    <AddNewCompany show="{{addNewCompany}}"></AddNewCompany>
+</modal>
+{{/if}}
+
+
+<script>
+  component.exports = {
+    onrender: async function () {
+        //console.log('Grid onrender')
+        var self = this;
+        window.Companies = self;
+        this.on('refresh', async function(){
+            //console.log('refreshing companies')
+            self.set('loading', true)
+//            var [resp,err] = await fetch2('?query=select * from post');
+            var [resp,err] = await fetch2("?query=PRAGMA table_info('files')");
+            
+            self.set('loading', false)
+            if (resp) self.set('rows', resp)
+        })
+        this.fire('refresh')
+        
+        this.on('*.clickhandlerfromtable', function(e,e1,e2){
+//            console.log('clickhandlerfromtable',e,e1,e2)
+            self.set('currFilterIndex', 'fgr'+e)
+            self.set('showModal',true)
+        })
+        
+
+    },        
+    data:function() {
+            return {
+                G:null
+                //, columns:null
+                , rows:[]
+                , refresh:0
+                , fr:[]
+                , loading:false
+                , currFilterIndex:''
+                , row:{}
+                , addNewCompany:false    
+                , columns:null 
+                /*    
+                 , columns: [
+        //        {visible:true , filter:false, compId:"id", compType:"text", label:"Naziv", w:"20%", template:"<img style='height:2em' src='objengine/image.php?filename={{viewport[i][.compId]}}&h=140'>"}
+                   // {visible:true , filter:true, compId:"id", compType:"text", label:"Naziv", w:"100%",
+                  //  template:"<div> {{viewport[i]['id']}}</div>" },Number(77).toFixed(2)  , template:"{{Number(viewport[i][compId]).toFixed(2)}}"
+
+                  {visible:true , filter:false, compId:"profile_image", compType:"text", label:"", w:"100px"
+                  , template:"<img src='https://resize-service.buildcon.org/?url={{viewport[i].profile_image}}&width=100'>" },
+                  {visible:true , filter:true, compId:"user_name", compType:"text", label:"Owner", w:"50%", showDataTips:true,
+                    template:`<strong>{{viewport[i].user_name}}</strong>
+                  <p style="margin:0"><a href="mailto:{{viewport[i].email}}">{{viewport[i].email}}</a></p>
+                  <p><a href="tel:{{viewport[i].user_phone}}">{{viewport[i].user_phone}}</a></p>`},
+                  {visible:false , filter:true, compId:"email", compType:"text", label:"email", w:"12em"},
+                  {visible:false , filter:true, compId:"user_phone", compType:"text", label:"user_phone", w:"12em"},
+
+                  {visible:true , filter:true, compId:"name", compType:"text", label:"Name", w:"50%", 
+                    template:`<strong>{{viewport[i].name}}</strong>
+                    <p style="margin:0">{{viewport[i].address}} &nbsp;</p>
+                    <p><a href="tel:{{viewport[i].user_phone}}">{{viewport[i].phone}}</a></p>` },
+                  {visible:false , filter:true, compId:"address", compType:"text", label:"Address", w:"12em"},
+                  {visible:false , filter:true, compId:"phone", compType:"text", label:"Phone", w:"15em"},
+                  {visible:true , filter:true, compId:"created_date", compType:"text", label:"Created", w:"12em"},
+                  {visible:true , filter:true, compId:"subdomain", compType:"text", label:"Subdomain", w:"15em", template:`<p><a href="https://{{viewport[i][compId]}}.buildcon.org" target="_blank">{{viewport[i][compId]}}</a></p>`},
+                  {visible:true , filter:true, compId:"user_limit", compType:"center", label:"User limit", w:"5em", template:"{{Number(viewport[i][compId]).toFixed(0)}}"},
+                  {visible:true , filter:true, compId:"users_count", compType:"center", label:"User count", w:"6em"
+                  , template:`<span style="color:{{viewport[i][compId]>viewport[i].user_limit?'red':'inherit'}}">{{Number(viewport[i][compId]).toFixed(0)}}</span>`},
+                  {visible:true , filter:true, compId:"constructions_count", compType:"center", label:"Constr count", w:"7em"
+                  , template:"{{Number(viewport[i][compId]).toFixed(0)}}"},
+                ]
+                */
+            }
+        }
+    ,computed:{
+        construction_total:function(){
+                var fr = this.get('fr')
+                var l = fr.length;
+                var tc=0;
+                for (var i=0;i<l;i++) tc += fr[i].constructions_count;
+                return tc
+            },
+            users_total:function(){
+                var fr = this.get('fr')
+                var l = fr.length;
+                var tc=0;
+                for (var i=0;i<l;i++) tc += fr[i].users_count;
+                return tc
+            },
+    }
+  };
+  </script>

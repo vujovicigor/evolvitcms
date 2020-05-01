@@ -1,0 +1,115 @@
+<section style="flex:1; padding-bottom:0.5rem; padding-top:0.5rem; overflow:auto; display:{{selectedModule == 'dospece'?'':'none'}}">
+    <div style="width:{{rows.head.length * 8 + 22}}rem" >
+        <div class="h" style="width:19rem">Day</div>
+        {{#each rows.head:x}}
+        <div class="h" style="{{~/x==x ?'background-color:rgba(110, 210,250,0.1)':''}}" >{{.d}}</div>
+        {{/each}}
+        <br>
+        <div class="h" style="width:19rem">Week</div>
+        {{#each rows.head:x}}
+        <div class="h" style="{{~/x==x ?'background-color:rgba(110, 210,250,0.1)':''}}" >WEEK {{.w}}</div>
+        {{/each}}
+        <br>
+        <div class="h" style="width:19rem">Delivery from</div>
+        {{#each rows.head:x}}
+        <div class="h" style="{{~/x==x ?'background-color:rgba(110, 210,250,0.1)':''}}" >{{.c}}</div>
+        {{/each}}
+    </div>
+
+    <div style="width:{{rows.head.length * 8 + 20}}rem" >
+        {{#each rows.rows:y}}
+            <div class="h" style="width:19rem; {{~/y==y?'background-color:rgba(110, 210,250,0.1)':''}}">{{.name}}&nbsp;</div>
+            {{#each .nums:x}}
+            <div class="b" on-tap="@this.fire('setxy',x,y)" style="{{~/y==y || ~/x==x ?'background-color:rgba(110, 210,250,0.1)':''}}">
+               {{formatNumber(.)}}&nbsp;
+               <!-- {{.}}&nbsp; -->
+            </div>
+            {{/each}}
+            <br>
+        {{/each}}
+    </div>
+    
+</section>
+<section style="padding-bottom:0.5rem; padding-top:0.5rem; display:{{selectedModule == 'dospece'?'':'none'}}">
+    <button primary m-full on-click="@this.getdospece()" style="width: 100%;">Last sync: {{dospeceDate}}
+        <i style="float:right" class="glyphicon {{dospeceIsLoading?'glyphicon-repeat fast-right-spinner':'glyphicon-refresh'}} "></i>
+    </button>
+</section>
+<style>
+    .h{
+        width:8rem; 
+        display: inline-block; 
+        background-color:lightblue;
+        text-align: center;
+        border: solid 1px gray;
+    }
+    .b{
+        font-weight: bold;
+        width:8rem; 
+        display: inline-block; 
+        border: solid 1px gray;
+        text-align: right;
+    }
+</style>
+<script>
+  component.exports = {
+    onrender: function () {
+        var self = this;
+        const got = require('got');
+        this.formatDate = function(date){
+            return  date.getDate() + '.' + (date.getMonth()+1) + '.' + date.getFullYear() + ' ' + date.getHours()+':' + date.getMinutes()
+        }
+        this.observe('selectedModule', function(n){
+            if (n=='dospece') self.getdospece();
+        }, {init:false});
+
+        this.on('setxy', function(x,y){
+            //console.log(x,y)
+            self.set('x',x)
+            self.set('y',y)
+        })
+        setTimeout(function(){
+            var dospeceDate = localStorage.getItem("dospeceDate");
+            if (dospeceDate) {
+                var date = new Date(parseInt(dospeceDate));
+                self.set('dospeceDate', self.formatDate(date));
+                self.set('rows', cacheLocalStorage.dospece?cacheLocalStorage.dospece:JSON.parse(localStorage.getItem("dospece")));
+            }
+        },1)
+        this.getdospece = async function() {
+            self.set('dospeceIsLoading', true);
+            try {
+                const response = await got('http://77.105.33.22:8765/dospece', { json: true });
+//                console.log(response.body);
+                localStorage.setItem("dospece", JSON.stringify(response.body));
+                var date= new Date();
+                var dateInt = date.getTime();
+                localStorage.setItem("dospeceDate", dateInt);
+                
+                var dateF = self.formatDate(date);
+                
+                self.set('dospeceDate', dateF);
+                self.set('dospeceIsLoading', false);
+                self.set('rows', response.body);
+            } catch (error) {
+                //console.log(error);
+                self.set('dospeceIsLoading', false);
+            }
+        }    
+        this.getdospece()
+    },        
+    data:function() {
+            return {
+                text: ''
+                , ur:null
+                , rows:{head:[], rows:[]}
+                , row:null
+                , dospeceDate: ''
+                , dospeceIsLoading:false
+                , x:null
+                , y:null     
+                , selectedModule:null       
+            }
+        }
+  };
+  </script>

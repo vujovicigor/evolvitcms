@@ -1,0 +1,117 @@
+
+<section style="flex:1; padding-bottom:0; padding:1rem; overflow:auto">
+    <grid>
+        <div col="1/1" style="display: flex;align-items: center;padding-bottom: 0;">
+            <span class="subheader" xx>Company </span>
+            <span class="hr" xx></span>
+        </div>
+        <div col='1/3'>
+            <label>Name</label>
+            <input type="text" placeholder="Company name" value={{in_company_name}}>
+        </div>
+        <div col='1/3'>
+            <label>Subdomain</label>
+            <input type="text" placeholder="subdomain" value={{in_subdomain}}>
+        </div>
+        <div col='1/3'>    
+            <label>Users limit</label>
+            <input type="number" placeholder="users" value={{in_user_limit}}>
+        </div>
+
+        <div col="1/1" style="display: flex;align-items: center;padding-bottom: 0;">
+            <span class="subheader" xx>Contract </span>
+            <span class="hr" xx></span>
+        </div>
+        <div col='1/3'>
+            <label>Value</label>
+            <input type="number" placeholder="0" value={{in_contract_value}}>
+        </div>
+        <div col='1/3'>
+            <label>Start date</label>
+            <input type="date" placeholder="Contract start date" value={{in_contract_start_date}}>
+        </div>
+        <div col='1/3'>    
+            <label>End date</label>
+            <input type="date" placeholder="Contract end date" value={{in_contract_end_date}}>
+        </div>
+
+        
+        <div col="1/1" style="display: flex;align-items: center;padding-bottom: 0;">
+            <span class="subheader" xx>Owner </span>
+            <span class="hr" xx></span>
+        </div>
+        <div col='1/2'>            
+            <label>Firstname</label>
+            <input type="text" placeholder="firstname" value={{in_firstname}}>
+        </div>
+        <div col='1/2'>
+            <label>Lastname</label>
+            <input type="text" placeholder="lastname" value={{in_lastname}}>
+        </div>
+        <div col='1/2'>
+            <label>Email</label>
+            <input type="text" placeholder="email" value={{in_email}}>
+        </div>
+        <div col='1/2'>
+            <label>Password</label>
+            <input type="password" placeholder="password" value={{in_password}}>
+        </div>
+    </grid>
+    <button primary m-full style="width: 100%; margin-bottom: 0;" on-click="CreateNewCompany">Create New Company</button>    
+
+</section>
+
+<style>
+.subheader {
+    color: var(--primary);
+    font-size: 1.8rem;
+}    
+.hr{
+    flex: 1; background: 1px var(--primary);height: 1px;margin-left: 0.5rem;
+}
+</style>
+
+<script>
+    component.exports = {
+        onrender: function () {
+            var self = this;
+            window.AddNewCompany = self
+            this.on('CreateNewCompany', async function(){
+                var o = self.get();
+                if (!o.in_company_name) {izitoast.error({ message: 'Company name missing'}); return}
+                if (!o.in_subdomain) {izitoast.error({ message: 'Company subdomain missing'}); return}
+                if (!o.in_firstname) {izitoast.error({ message: 'Owner firstname missing'}); return}
+                if (!o.in_lastname) {izitoast.error({ message: 'Owner lastname missing'}); return}
+                if (!o.in_email) {izitoast.error({ message: 'Owner email missing'}); return}
+                if (!o.in_password || o.in_password.length<5) {izitoast.error({ message: 'Owner password must have al least 5 charachers'}); return}
+                //console.log('CreateNewCompany post')
+                var [resp,err] = await fetch2('api/v2/SA_create_new_company', o)
+                //console.log(resp,err)
+                if (resp && resp.results ) {
+                    izitoast[resp.results.type]({ message: resp.results.message}); 
+                    if (resp.results.type == 'success') {
+                        if (self.parent) self.parent.fire('refresh');
+                        self.set('show', false)
+                    }
+                } else izitoast.error({ message: 'Error'});                
+
+            })
+    },        
+    data:function() {
+            return {
+                G:null
+                , in_company_name:null
+                , in_subdomain:null
+                , in_user_limit:10
+                , in_firstname:null
+                , in_lastname:null
+                , in_email:null
+                , in_password:null
+                , in_contract_value:0
+                , in_contract_start_date:null
+                , in_contract_end_date:null
+            }
+        }
+
+    };
+</script>

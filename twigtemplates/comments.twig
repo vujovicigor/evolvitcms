@@ -1,0 +1,123 @@
+<div class="container" id="commentsDiv">
+  {% set Comment = fetch("CommentByPostId", {PostId:Post.id}) %}
+  <h3 class="my-4">Comments <span class="badge badge-primary">{{Comment | length}}</span></h3>
+
+  <!-- List all comment -->
+  {% for item in Comment %}
+    <div class="card flex-row mb-4">
+      <div class="card-header border-0">
+        <img src="{{item.google_user_picture}}" style="width:50px">
+      </div>
+      <div class="card-body flex-col">
+        <h4 class="card-title">{{item.google_user_given_name}}</h4>
+        <div class="card-text flex-grow-1" style="white-space: pre-wrap;">{{item.Text}} 
+        </div>
+        {# <a href="#" class="card-link btn btn-secondary">Reply</a> #}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+
+<div class="container">
+  <card>
+    <h3>Post a Comment</h3>
+    <textarea class="form-control"  rows="5" id="textComment" placeholder="Sign in to comment"></textarea>
+    <div style="display:flex; justify-content: space-between;" class="mt-2">
+      <div id="my-signin2" style="display: inline-block;"></div>
+      <button id="publishComment" disabled class="btn btn-primary" style="margin:0" onclick="postComment()">Publish</button>
+    </div>
+  </card>
+</div>
+
+<script>
+  // Google auth
+  var GoogleUserData = {}
+  function onSuccess(googleUser) {
+    //console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
+    //console.log('Logged in detils: ' + JSON.stringify(googleUser.getBasicProfile()));
+    document.getElementById("textComment").placeholder = "Enter your comment..."
+    document.getElementById("publishComment").disabled = false
+    
+    var id_token = googleUser.getAuthResponse().id_token;
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'cms/googletokensignin.php');
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function() {
+      //console.log('Signed in as: ' + xhr.responseText);
+      try{
+        GoogleUserData =  JSON.parse(xhr.responseText)
+      }
+      catch(e){
+        console.log('Bad verification response', e)
+      }
+    };
+    xhr.send('idtoken=' + id_token);      
+
+  }
+  function onFailure(error) {
+    console.log(error);
+  }
+  function renderButton() {
+    gapi.signin2.render('my-signin2', {
+      'scope': 'profile email',
+      'width': 240,
+      'height': 50,
+      'longtitle': true,
+      'theme': 'dark',
+      'onsuccess': onSuccess,
+      'onfailure': onFailure
+    });
+  }
+
+
+function postComment(){
+  //console.log('comm')
+  var data = {};
+  data.textComment = document.getElementById("textComment").value
+  data.PostId = '{{Post.id}}'
+  document.getElementById("textComment").value = '';
+
+  var fd = new FormData();
+  for(var i in data)
+    fd.append(i,data[i]);
+
+{% verbatim %}
+
+  var xhr = new XMLHttpRequest();
+  xhr.responseType = 'json';
+  xhr.open('POST', 'cms/postComment.php', true);
+  //xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.onload = function(resp) {
+//      console.log(resp)
+    var newPostHtmlContent= t(`  
+      <div class="card flex-row mb-4">
+        <div class="card-header border-0">
+          <img src="{{google_user_picture}}" style="width:50px">
+        </div>
+        <div class="card-body flex-col">
+          <h4 class="card-title">{{google_user_given_name}}</h4>
+          <div class="card-text flex-grow-1" style="white-space: pre-wrap;">{{Text}} 
+          </div>
+        </div>
+      </div>`, xhr.response)
+    var newDiv = document.createElement('div');
+    newDiv.innerHTML = newPostHtmlContent;
+    document.getElementById('commentsDiv').appendChild( newDiv );
+  };
+
+  xhr.send(fd);   
+}
+
+// really micro templating 
+function t(s,d){
+  for(var p in d)
+    s=s.replace(new RegExp('{{'+p+'}}','g'), d[p]);
+  return s;
+}
+
+{% endverbatim %}  
+
+</script>
+
+<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>

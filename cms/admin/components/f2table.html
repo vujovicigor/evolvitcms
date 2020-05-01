@@ -1,0 +1,550 @@
+<div style="display:{{visible?'box':'none'}}; display:{{visible?'flex':'none'}}; box-orient: vertical; flex-flow:column; {{style}};  position: relative;overflow-x: hidden;" class="{{class}}">
+    {{#showSearch}}
+          <input value="{{filterfield}}" style="margin-bottom: 0 !important; padding-bottom: 0.5rem; text-align: center;"  placeholder="Search" > 
+    {{/}}
+    <div class="flexGrid" style="box-sizing: border-box; display:box; display: flex; background-color: var(--primary); color: #fff; flex-shrink:0; align-items: self-start;">
+      {{#if showHeaders}}
+<!--        <div class="flexGridHead {{variableRowHeight?'':'truncate'}}" style="width:3px; margin-top:1px; padding: 0"></div> -->
+        {{#columns}}
+            {{#if (.visible && (.visible===true || .visible==="true"))}}
+                <div class="flexGridHead {{headerFixedHeight?'truncate':''}} textAlign-{{.compType}}" style="width:{{.w || computedW}}"
+                on-tap="sortArr:{{.compId}},{{.compType}}">
+                    {{#currentSortField==.compId}}<i class="glyphicon glyphicon-arrow-{{currentSortAsc?'down':'up'}}"></i> {{/}} {{.label}}
+                </div>
+            {{/if}}
+        {{/}}
+      {{/if}}
+      
+        {{#if .hasScrollbar}}
+            <div style="width:{{ScrollbarWidth}}px"></div>
+        {{/if}}
+    </div>
+
+    <div style="box-flex:1; flex:1; overflow-y:auto; overflow-x:hidden" id="flexGridBody">
+        {{#viewport:i}}
+<!--            on-swipeleft="nextPage" on-swiperight="prevPage" 
+-->
+
+<!-- Grupisanje -->
+{{#if ~/group_by && viewport[i][ ~/group_by ] && (i===0 || viewport[i][ ~/group_by ] != viewport[i-1][ ~/group_by ]) }}
+<div class="subTitle" >
+<div> {{viewport[i][ ~/group_by ]}}</div>
+</div>
+{{/if}}
+
+            <div id="fgr{{i}}" style="{{row_style}} {{#if ._rowColor && !(.id && .id==~/selectid) }} color:{{._rowColor}};{{/if}}" 
+            class="flexGridRow {{alternateColor && (i)%2==0?'oddRow':''}}  {{!# (.id && .id==~/selectid)? ~/highlightClass:''}}" 
+            on-click="@this.fire('tableclickhandler',@this.event,i)" 
+              >
+<!--                <div class="rowcel {{variableRowHeight?'':'truncate'}}" style="align-self: stretch; width:3px; background-color:{{.id && .id==~/selectid? 'darkorange':'green'}}; margin-top:1px; padding: 0"></div>
+-->                
+
+                {{#columns}}
+<!--
+                    {{#if (.visible && i<viewport.length && (.visible===true || .visible==="true") && viewport[i] && typeof viewport[i][.compId]!=='undefined' )}}
+-->
+                    {{#if (.visible  && (.visible===true || .visible==="true") )}}
+                        <div style="width:{{.w || computedW}}"  class="rowcel {{variableRowHeight?'':'truncate'}} textAlign-{{.compType}}"
+                        data-th="{{.label}}" 
+                        {{#if .showDataTips}}
+                        title="{{.dataTipField?viewport[i][.dataTipField]:viewport[i][.compId]}}"
+                        {{/if}} 
+                        >
+<!--                                {{#if .template && partialsList[.compId]}}  -->
+                                {{#if partialsList[.compId]}}
+                                    {{>'part_' + .compId}}
+                                {{else}}
+                                    {{#if .compType=='CHECKBOX' }}
+                                    <i class="glyphicon glyphicon-{{#if viewport[i] && viewport[i][.compId]===true || viewport[i][.compId]=='true'}}ok green {{else}}remove red{{/if}}"></i>
+<!--                                        <ToggleButton style="font-size:1.2em;" checked='{{viewport[i][.compId]}}' row='{{viewport[i]}}' compName='{{.compId}}'></ToggleButton>
+                                        <i class="glyphicon glyphicon-{{#if viewport[i] && viewport[i][.compId]===true || viewport[i][.compId]=='true'}}ok green {{else}}remove red{{/if}}"></i> -->
+                                    {{elseif .compType=='NUMBER' }} 
+                                        {{formatNumber(viewport[i][.compId])}}
+                                    {{elseif .compType=='COLOR' }} 
+                                        <div style="background-color:{{viewport[i][.compId]}}; width:7em; max-width:100%">{{viewport[i][.compId]}}&nbsp;</div>
+                                    {{elseif .compType=='html' }} 
+                                        {{{viewport[i][.compId]}}}
+                                    {{elseif .compType=='imagebase64' }} 
+                                         <img class="img-responsive img-rounded" src="{{viewport[i][.compId]}}" alt="" style="max-height:4em; height:4em"> 
+                                    {{elseif .compType=='IMAGE' }} 
+                                         <img src="{{HOSTNAME}}image.php?id={{viewport[i][.compId] || 'noimage.svg'}}" alt="" style="max-height:4em; margin: auto"> 
+                                    {{else}}
+                                        {{viewport[i][.compId]}}
+                                    {{/if}}
+                                {{/if}}
+
+                        </div>
+                    {{/if}}
+                {{/}}
+            </div>
+<!--        {{/if}} -->
+        {{/viewport}}
+
+        {{#if loading}}
+        <div class="spinner-loader" style="position: absolute;top: 0; bottom: 0; margin: auto; left: 0; right: 0"></div>
+        {{/if}}
+        {{#if nodata}}
+        <div class="animated infinite flash" style="position: absolute;top: 50%; bottom: 50%; margin: auto; left: 0; right: 0;font-weight: bold; color:grey; text-align:center">No data</div>
+        {{/if}}
+        {{#if rows.length==0 && !loading}}
+        {{yield}}
+        {{/if}}
+
+        
+    </div>
+
+
+    {{#showPaginator && filteredRows.length >= ipp }}
+        <div style="display:flex; flex-shrink:0; align-items: center;"> 
+            <div> 
+                <span><strong>{{filteredRows.length}}</strong> item{{filteredRows.length>1?'s':''}}. </span>
+    <!--
+                <select value='{{ipp}}'>
+                    {{#ippSelect}}
+                        <option value={{.}}>{{.}}</option>
+                    {{/ippSelect}}
+                </select> items per page.   
+    -->
+            </div>
+
+            <div style="flex:1; display: flex; justify-content: flex-end; align-items: center;">
+    <!--            
+                <button type="button" class="btn btn-default btn-sm btn-paging" on-tap="setPage:0" disabled="{{cp_computed==0}}" ><i class="glyphicon glyphicon-backward"></i></button>
+                <button type="button" class="btn btn-default btn-sm btn-paging" on-tap="prevPage"  disabled="{{cp_computed==0}}" ><i class="glyphicon glyphicon-triangle-left"></i></button>
+    -->
+                <button type="button" style="margin: 0;padding:0 ;width: 4rem;height: 4rem;" 
+                on-tap="prevPage" disabled="{{cp_computed==0}}"> <i class="glyphicon glyphicon-triangle-left"> </button>
+
+                <div style="width:4px"></div>
+    <!--            Page&nbsp; -->
+                <select value='{{cp_computed}}' style="width:5em; margin: 0.2em; height: 4rem;margin-bottom: 0 !important;" >
+                    {{#paginationbuttons:p}}
+                        <option value={{p}}>{{p+1}}</option>
+                    {{/}}
+                </select>&nbsp;/ {{paginationbuttons.length}}   
+                <div style="width:4px"></div>
+
+                <button type="button" style="margin: 0;padding:0 ;width: 4rem;height: 4rem;" on-tap="nextPage" disabled="{{(paginationbuttons.length-1)==cp_computed}}" ><i class="glyphicon glyphicon-triangle-right"></i> </button>
+<!--
+                <button type="button" class="btn btn-default btn-sm btn-paging" on-tap="nextPage" disabled="{{(paginationbuttons.length-1)==cp_computed}}" ><i class="glyphicon glyphicon-triangle-right"></i></button>
+                <button type="button" class="btn btn-default btn-sm btn-paging" on-tap="setPage:{{paginationbuttons.length-1}}" disabled="{{(paginationbuttons.length-1)==cp_computed}}" ><i class="glyphicon glyphicon-forward"></i></button>
+-->
+            </div>
+
+        </div>
+    {{/}}
+</div>
+
+<style>
+.subTitle{
+    background-color: var(--primary);
+    color: white;
+    position: sticky;
+    top: 0px;
+    z-index: 1;
+    padding: 4px;
+}
+select:hover, select:active, select:focus { background-color:#fff !important;}
+.highlight{
+    background-color:#d4d7dd !important;
+}
+.highlight::after{
+    content: "";
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    background-color: var(--primary);
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+.rowcel, .flexGridHead {
+    width:20%; 
+    margin: 0;
+    padding: 0;
+    padding: 4px; 
+    word-break: break-all;
+    word-wrap: break-word;
+    white-space: pre-line;
+    cursor:pointer;
+}
+
+
+.flexGridHead {
+    word-break: break-word !important;
+    font-weight: 400;
+    cursor:pointer;
+    -webkit-user-select: none;  
+    -moz-user-select: none;    
+    -ms-user-select: none;      
+    user-select: none;    
+}
+.flexGridRow {
+    box-sizing: border-box; 
+    display:box;
+    display: flex; 
+    background-color: #ffffff; 
+ /*   border-bottom: 1px solid #dddddd; */
+    align-items: center;
+}
+
+.flexGridRowDUMMY:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.oddRow {
+    background-color: #eeeeee;
+}
+
+.flexGridRow:hover { 
+/*    transition: color 0.3s ease-out; 
+    color: orange !important; 
+
+*/
+    background-color:#e8e8e8;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.green{ color:green}
+.red{ color:red}
+.textAlign-NUMERIC, .textAlign-NUMBER, .textAlign-INTEGER, .textAlign-RANGE { text-align:right;}
+.textAlign-center{ text-align:center;}
+</style>
+
+<script>
+    component.exports ={
+        isolated:true
+        ,onrender: function ( options ) {
+            var self = this;
+            self.set('HOSTNAME', HOSTNAME);
+            var el = self.nodes.flexGridBody;
+            //TODO: Ovo treba samo jednom, u globals
+            function getScrollbarWidth() {
+                var outer = document.createElement("div");
+                outer.style.visibility = "hidden";
+                outer.style.width = "100px";
+                outer.style.msOverflowStyle = "scrollbar"; // needed for WinJS apps
+                document.body.appendChild(outer);
+                var widthNoScroll = outer.offsetWidth;
+                // force scrollbars
+                outer.style.overflow = "scroll";
+                // add innerdiv
+                var inner = document.createElement("div");
+                inner.style.width = "100%";
+                outer.appendChild(inner);        
+                var widthWithScroll = inner.offsetWidth;
+                // remove divs
+                outer.parentNode.removeChild(outer);
+                return widthNoScroll - widthWithScroll;
+            };
+            self.set('ScrollbarWidth',getScrollbarWidth());
+
+    		var getflexGridBodyW = function(){
+    		   // var el = document.getElementById('flexGridBody');  // TODO, bez ID-ja
+    		    var el = self.nodes.flexGridBody;
+    		    if (!el){console.log('el undefined'); return;}
+    		   // console.log('clientHeight ',el.clientHeight);
+    		   // console.log('scrollHeight ',);
+    		    self.set('hasScrollbar',(el.scrollHeight > el.clientHeight)?true:false);
+    		    //console.log('el.scrollHeight:',el.scrollHeight,' el.clientHeight:', el.clientHeight);
+    		}
+    		getflexGridBodyW(self);  // TODO, ovo treba i na resize event
+
+            this.observe('viewport', function(n,o,k){
+                getflexGridBodyW();
+               // console.log('viewport trigger getflexGridBodyW() = ');
+                setTimeout(getflexGridBodyW, 1000);
+            }, {defer:true});
+
+
+            this.observe('rows refresh', function(n,o,k){  // GET columns definition from first row if no definition
+                //console.log('observe("rows")');
+                if ( (!self.get('columns') || self.get('columns').length==0) && (self.get('rows') && self.get('rows').length>0 )){
+                    //console.log('GET columns definition from first row if no definition');
+                    var columns=[];
+					for (var prop in self.get('rows.0')) {
+					   columns.push( {visible:true , filter:true, compId:prop, label:prop} );
+					}
+					self.set('columns', columns);
+                }
+            }, {init:false});
+
+            
+/*            
+
+            // ne treba mi sad al greota se baci
+            var isElementInViewport = function  (el) {
+                if (typeof jQuery === "function" && el instanceof jQuery) {
+                    el = el[0];
+                }
+                var rect = el.getBoundingClientRect();
+                var parent = $('#flexGridBody')[0].getBoundingClientRect();
+                return ( rect.bottom > parent.top && rect.top <= parent.bottom );
+            }
+  */          
+            
+            window.addEventListener('resize', getflexGridBodyW);
+            el.addEventListener("scroll", onscroll );
+            
+            self.on('teardown', function(){
+                //console.log('ftable teardown');
+                window.removeEventListener('resize', getflexGridBodyW);
+                //this.nodes.flexGridBody.removeEventListener('scroll', onscroll); // flexGridBody is destroyed before teardown
+            })
+            
+            var lastnodeid=null;
+            this.on('tableclickhandler', function (event,nodeid){
+                //console.log('orgtableclickhandler', this.event);
+                
+                //console.log('orgtableclickhandler', event,nodeid,);
+                if (event.original.target.nodeName == 'A') return ;// skip if <a href..
+                $(self.nodes['fgr'+nodeid]).addClass(self.get('highlightClass'));  // da bi ga  odma iscrtao
+                //$(self.nodes['fgr'+nodeid]).children().first().css( "background-color", "darkorange" );
+                if (lastnodeid!==null && lastnodeid!==nodeid){
+                    $(self.nodes['fgr'+lastnodeid]).removeClass(self.get('highlightClass'));  // da bi ga odma iscrtao
+                //    $(self.nodes['fgr'+lastnodeid]).children().first().css( "background-color", "green" );
+                }
+                lastnodeid = nodeid;
+                setTimeout(function(){
+                    var currViewportIndex = nodeid;// Number((event.keypath).split('.').pop()) ;
+                    var currFilterIndex = currViewportIndex + self.get('ipp') * self.get('cp') ;
+                    self.set('currFilterIndex', currFilterIndex); 
+                    self.set('row', $.extend({},self.get(event.keypath)));
+                    self.set('selectid', self.get(event.keypath+'.id'));
+                    // console.dir(self.get('env.selectid'));
+                    // self.set( 'clickedRowIndex', event.index.i);
+                    self.set( 'clickedRowIndex', currFilterIndex);
+                    self.fire('clickhandlerfromtable', currFilterIndex, self); // Fire event to parent
+                }, 0);
+                
+            });
+        /*
+            this.observe('serviceName', function(n,o,k){
+                self.set('filterfield','')
+                self.set('rows',[]);
+            })
+        */
+            this.observe('columns', function(n,o,k){
+                //self.set('renderLimit', 30);
+                var columns = self.get('columns') || [];
+                var w; var wsum=0; var wcount=0;
+                var l = columns.length;
+                self.set('partialsList',{});
+                for(var i=0; i<l;i++) {
+                    if (columns[i].template && columns[i].template!=''){
+                        self.partials['part_' + columns[i].compId] = columns[i].template;
+                        self.set('partialsList.'+columns[i].compId, true);
+                    }
+                    else
+                        switch(columns[i].compType) {
+                            case 'checkbox':
+                    //            self.partials['part_' + columns[i].compId] = "<i class=\"glyphicon glyphicon-{{(viewport[i][.compId]===true || viewport[i][.compId]=='true')?'ok green':'remove red'}}\"></i>";
+                                
+                     //           self.set('partialsList.'+columns[i].compId, true);
+                                break;
+                     //       default:
+                        } 
+                      //  self.partials['part_' + columns[i].compId] = 'rows[i][.compId]';
+                    
+                }
+            });
+            
+            self.observe('cp_computed', function(){
+                self.nodes.flexGridBody.scrollTop=0;
+            }, {defer:true} )
+            
+            self.on( 'setPage', function ( event, p ){
+                self.set('cp_computed',p);
+             });
+            self.on( 'nextPage', function ( event, p ){
+                //if ( self.get('cp_computed') <  Math.ceil( self.get('filteredRows').length / self.get('ipp') )-1 )
+                var cp = self.get('cp_computed');
+                var l = self.get('filteredRows').length;
+                var ipp = self.get('ipp');
+                var happyrcu=2/2;
+                if ( cp <  (Math.ceil( l / ipp )-1) )
+                    self.add('cp_computed');
+             });
+            self.on( 'prevPage', function ( event, p ){
+                if ( self.get('cp_computed') > 0  )
+                    self.subtract('cp_computed');
+             });
+             self.on( 'sortArr', function (event, f, t){
+                var currentSortField = self.get('currentSortField');
+                var currentSortAsc = self.get('currentSortAsc');
+
+                var group_by = this.get('group_by');
+                var group_by_order_asc = this.get('group_by_order_asc');
+                if (group_by === f){
+                    group_by_order_asc = group_by_order_asc == 'false'? 'true' : 'false';
+                    self.set('group_by_order_asc',group_by_order_asc);
+                    return
+                }
+
+                if (currentSortField === f) 
+                    self.toggle('currentSortAsc')
+                else
+                    self.set({'currentSortField':f, 'currentSortAsc':true, 'currentSortFieldType':t});
+
+                               
+            });
+            
+
+    	},
+        data:function() { 
+            return { 
+                row: { } // selected row
+                , env: {objectname:"urlzaajax"}
+                , selectid:null
+                , clickedRow:-1
+                , visible:true
+                , headerFixedHeight:true, variableRowHeight:false, showSearch:true, showPaginator:true, showHeaders:true, alternateColor:true
+           //     , renderLimit:30
+                , loading:false, nodata:false
+                , serviceName:null   
+                , columns: [
+                        //{visible:true , filter:false, compId:"Slika", compType:"image", label:"Slika neka", w:"20%", template:"<img style='height:2em' src='objengine/image.php?filename={{viewport[i][.compId]}}&h=140'>"}
+                        ]
+                , hasScrollbar:false, ScrollbarWidth:16
+                , rows:[
+                    //,{ "imeVlasnika":"Mitar", "brojKomada":"7 kom", "rememberMe":"false","datum":"12.12.12", Boja:"#0000f0", Slika:"F201408082213186399.jpg" }
+                ]
+                , refresh:0
+                , partialsList:{}
+                , ipp:30, cp:0
+                , currentSortField:'', currentSortAsc:true
+                , ippSelect:[5, 10, 30, 50, 100], filterfield:''
+                , currFilterIndex:null
+                , highlightClass:'highlight'
+                , fr:[]
+                , row_style:''
+                , group_by:null
+                , group_by_order_asc:null
+            }
+        }
+        ,computed:{
+              cp_computed:  {
+                get:  function () { 
+                      var ipp= this.get('ipp');
+                      var cp = this.get( "cp" );
+                      var fl = Math.floor( this.get('filteredRows').length / ipp);
+                      return  (cp >  fl)? fl : cp;
+                },
+                  set: function(value){  this.set('cp', value );  }
+              },
+              filteredRows:function()
+                  {
+                    //handle filter
+                    var filterfield = this.get('filterfield').toLowerCase();
+                    var r;
+                    var c = this.get('serviceName');
+                    //console.log('filteredRows serviceName = ',c);
+                    var columns=this.get('columns') || [];
+                    var l = columns.length;
+                    if (!l) return [];
+                      
+                    if (filterfield!=='')
+                        r=this.get('rows').filter(function(row){
+                            for(var i=0; i<l;i++) 
+                                if (columns[i].filter && row[columns[i].compId] && String(row[columns[i].compId]).toLowerCase().indexOf(filterfield)>=0 ) return true;
+/*
+                                for (var prop in row) {
+                                    console.log("row." + prop + " = " + row[prop]);
+                                    if (row[prop] && row[prop].toLowerCase().indexOf(filterfield)>=0 ){ console.log('FOUND',filterfield); return true;}
+                                }
+                                */
+                            return false;
+                        })
+                    else
+                        if (currentSortField == '')
+                            return this.get('rows');
+                        else
+                            r=this.get('rows').slice();
+
+                     //handle sort
+                    var currentSortField = this.get('currentSortField');
+                    var currentSortAsc = this.get('currentSortAsc');
+                    //console.log('currentSortField', currentSortField, 'currentSortAsc', currentSortAsc)
+                    currentSortAsc = (currentSortAsc*2-1);
+                    /*
+                    if (currentSortField !== ''){
+                         // if (!r) r=this.get('rows');
+                          //if (currentSortAsc)
+                            if (this.get('currentSortFieldType')!='NUMERIC' && this.get('currentSortFieldType')!='RANGE' && this.get('currentSortFieldType')!='INTEGER')
+                                r.sort(function(a,b) 
+                                {
+                                 return ( a[currentSortField] < b[currentSortField]?-1*currentSortAsc:currentSortAsc );
+                                } )
+                            else
+                                r.sort(function(a,b) 
+                                {
+                                 return ( Number(a[currentSortField]) < Number(b[currentSortField])?-1*currentSortAsc:currentSortAsc );
+                                } )
+                     }
+*/
+                    
+                    var cast2num;
+                    if (this.get('currentSortFieldType')!='NUMERIC' && this.get('currentSortFieldType')!='RANGE' && this.get('currentSortFieldType')!='INTEGER')
+                        cast2num = function(x){ return x}
+                    else
+                        cast2num = function(x){ return Number(x)};
+
+
+                    var group_by = this.get('group_by');
+                    var group_by_order_asc = this.get('group_by_order_asc');
+                    group_by_order_asc = group_by_order_asc == 'false'? 1 : -1;
+                    
+                    if (group_by || currentSortField !== '')
+                        r.sort(function(a,b) {
+                            //console.log('a[group_by] == b[group_by]', a[group_by] , b[group_by])
+                            if (!group_by || a[group_by] == b[group_by])
+                                return currentSortField == ''?0:( cast2num(a[currentSortField]) < cast2num(b[currentSortField])?-1*currentSortAsc:currentSortAsc );
+                            return a[group_by] < b[group_by]? -1*group_by_order_asc:1*group_by_order_asc;
+                        } )
+
+                    this.set('fr',r)
+                    return r ;
+                  },
+                  
+              paginationbuttons:function()
+                  {
+                      return new Array(Math.ceil( this.get('filteredRows').length / this.get('ipp') )) 
+                  },
+              viewport: function()
+                  {
+                      var r  = this.get('filteredRows');
+                      if (!this.get('showPaginator')) return r;
+        //              var r  = this.get('rows');
+                      var ipp= this.get('ipp');
+                      var cp = this.get('cp_computed');
+                      //console.log('viewport calc', ipp, cp );
+                      return r.slice(cp*ipp, cp*ipp+ipp) ;
+                  }
+                ,computedW: function(){
+                    //var c = this.get('serviceName');
+                    var columns = this.get('columns') || [];
+                    var w; var wsum=0; var wcount=0;; var visiblecount=0;
+                    var l = columns.length;
+                    for(var i=0; i<l;i++) {
+                        if (columns[i].visible ===true || columns[i].visible ==="true") visiblecount++;
+                        // fixing width 
+                        if ((columns[i].visible ===true || columns[i].visible ==="true") && columns[i].w){
+                            w = columns[i].w.replace(/\s/g, '');
+                            w = w.split('%')[0];
+                            w = isNaN(w)?0:parseInt(w, 10);
+                            if (w) wsum =wsum+w;
+                            wcount++;
+                        }
+                    }
+
+                    if (wsum==100) return '0%';
+                    wsum = (100-wsum)/(visiblecount-wcount);
+                    return wsum+'%';
+                }
+          }
+    }
+</script>

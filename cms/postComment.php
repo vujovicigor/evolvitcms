@@ -16,6 +16,7 @@ insert into `Comment` ( `PostId`, `Text`, `google_user_email`, `google_user_fami
 values ( :PostId, :textComment, :_session_google_user_email, :_session_google_user_family_name, :_session_google_user_given_name, :_session_google_user_picture, :_session_google_user_sub)
 ;SELECT * from Comment where id = last_insert_rowid();', $_POST);
 //print_r( $f );
+$f[0]['Text'] = htmlspecialchars($f[0]['Text']);
 echo json_encode($f[0]);
 //header('Location: '.$_SERVER['PHP_SELF']);
 

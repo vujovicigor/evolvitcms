@@ -62,7 +62,7 @@ var sortableDecorator = (function ( global, factory ) {
 
 	'use strict';
 
-  console.log('sortableDecorator')
+  //console.log('sortableDecorator')
 	// Common JS (i.e. browserify) environment
 	if ( typeof module !== 'undefined' && module.exports && typeof require === 'function' ) {
 		factory( require( 'ractive' ) );

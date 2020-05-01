@@ -1,0 +1,65 @@
+<iframe style="width: 100%; border: 0;height: 410px" id="summernoteframe{{id}}" src="summernoteframe.html"></iframe>
+
+{{#if showFileBrowse}}
+<modal show="{{showFileBrowse}}" cw="{{cw}}" title="Browse" 
+class="animated fadeInRight" showOverlay="{{true}}" style="
+height: 44em;
+width: 50em;
+left: calc(50% - 25em);
+right: inherit;
+top: calc(50% - 22em);
+bottom: inherit;" >
+    <ImageBrowser path="{{pathvarname}}" show="{{showFileBrowse}}"></ImageBrowser>
+</modal>
+{{/if}}
+
+<script>
+  component.exports ={
+    onrender: function(){
+      var self = this;
+      //this.set('id', GLOBALHtmlEditCounter++)
+      var id = this.get('id');
+      var child = document.getElementById("summernoteframe"+id).contentWindow.window;
+      //console.log('summernoteframe child', child)
+      child.PARENT = this
+      // store to global var
+      window['summernoteframe'+id] = this;
+
+
+      this.on('path', function(path){
+        if (!path) return;
+        child.$('#summernote').summernote('editor.restoreRange');
+        child.$('#summernote').summernote('editor.focus');
+        var ext = path.split('.').pop();
+        //var imgs = ['jpg', 'jpeg', 'gif', 'png', 'bmp'];
+        var imgs = ["ase","art","bmp","blp","cd5","cit","cpt","cr2","cut","dds","dib","djvu","egt","exif","gif","gpl","grf","icns","ico","iff","jng","jpeg","jpg","jfif","jp2","jps","lbm","max","miff","mng","msp","nitf","ota","pbm","pc1","pc2","pc3","pcf","pcx","pdn","pgm","PI1","PI2","PI3","pict","pct","pnm","pns","ppm","psb","psd","pdd","psp","px","pxm","pxr","qfx","raw","rle","sct","sgi","rgb","int","bw","tga","tiff","tif","vtf","xbm","xcf","xpm","3dv","amf","ai","awg","cgm","cdr","cmx","dxf","e2d","egt","eps","fs","gbr","odg","svg","stl","vrml","x3d","sxd","v2d","vnd","wmf","emf","art","xar","png","webp","jxr","hdp","wdp","cur","ecw","iff","lbm","liff","nrrd","pam","pcx","pgf","sgi","rgb","rgba","bw","int","inta","sid","ras","sun","tga"]
+        if ( imgs.includes(ext.toLowerCase()) ) 
+        child.$('#summernote').summernote('insertImage', 'image.php?id='+path, path)
+        else 
+        child.$('#summernote').summernote('createLink', { text: path, url: 'image.php?id='+path, isNewWindow: true });
+      })
+
+      var tryinject = function(v){
+        if (child.$ && child.summerReady) { child.$('#summernote').summernote('code', v) }
+        else setTimeout(function(){tryinject(v)}, 500)
+      }
+      this.observe('code', function(v){
+          if( self.get('fromParent') ) {
+            tryinject(v) 
+          }
+      });
+      
+    },   // data:{code:null, fromParent:true}
+
+        data:function() { 
+            return {
+                 showFileBrowse:false
+                , pathvarname:''
+                , code:null
+                , fromParent:true
+                , id:GLOBALHtmlEditCounter++
+             }
+        }
+}
+
+</script>

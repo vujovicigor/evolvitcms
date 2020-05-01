@@ -7,7 +7,7 @@ var Cropper = require('cropperjs');
 window.Cropper = Cropper
 
 var decoratorsSortable = require( './ractive-decorators-sortable.js' );
-console.log('decoratorsSortable', decoratorsSortable)
+//console.log('decoratorsSortable', decoratorsSortable)
 
 window.GlobalIncrementer = 1;
 /*
@@ -83,7 +83,7 @@ window.fetch2 = function(url, obj){
         })
       .catch(function(err){
           if (self) self.set('loading', false)
-          console.log('nework error!', err);
+          //console.log('nework error!', err);
           izitoast.error({ message: 'Network error!!!'});
           resolve([null,err])
       })
@@ -272,53 +272,54 @@ Ractive.components[ 'Select' ] = Ractive.extend( {
 });
 
 //Ractive.defaults.data.moment = moment;
-Ractive.components.Root                    =  require('./Root.html');
-Ractive.components.f2table                 =  require('./f2table.html');
-Ractive.components.modal                 =  require('./modal.html');
+Ractive.components.Root                    =  require('./components/Root.html');
+Ractive.components.f2table                 =  require('./components/f2table.html');
+Ractive.components.modal                 =  require('./components/modal.html');
 /*
-Ractive.components.stanje                  =  require('./stanje.html');
-Ractive.components.dospece                 =  require('./dospece.html');
-Ractive.components.izdatiracuni            =  require('./izdatiracuni.html');
-Ractive.components.zalihe                  =  require('./zalihe.html');
+Ractive.components.stanje                  =  require('/components./stanje.html');
+Ractive.components.dospece                 =  require('./components/dospece.html');
+Ractive.components.izdatiracuni            =  require('/components./izdatiracuni.html');
+Ractive.components.zalihe                  =  require('/components./zalihe.html');
 */
-//Ractive.components.Grid                    =  require('./Grid.html');
-//Ractive.components.settings                =  require('./settings.html');
-//Ractive.components.Companies               =  require('./Companies.html');
-//Ractive.components.Company                 =  require('./Company.html');
-Ractive.components.Login                   =  require('./Login.html');
-//Ractive.components.AddNewCompany           =  require('./AddNewCompany.html');
-//Ractive.components.FaqCategories           =  require('./FaqCategories.html');
-//Ractive.components.FaqCategory             =  require('./FaqCategory.html');
-//Ractive.components.FaqQuestions            =  require('./FaqQuestions.html');
-//Ractive.components.FaqQuestion             =  require('./FaqQuestion.html');
-//Ractive.components.Users                   =  require('./Users.html');
-Ractive.components.TGrid                   =  require('./TGrid.html');
-Ractive.components.TDetails                =  require('./TDetails.html');
-Ractive.components.TDetailsSingle          =  require('./TDetailsSingle.html');
-Ractive.components.ImageBrowser            =  require('./ImageBrowser.html');
-Ractive.components.Schema                  =  require('./Schema.html');
-Ractive.components.SchemaNew               =  require('./SchemaNew.html');
-Ractive.components.SchemaFiledAdd          =  require('./SchemaFiledAdd.html');
-Ractive.components.map                     =  require('./map.html');
-//Ractive.components.HtmlEdit                =  require('./HtmlEdit.html');
-Ractive.components.HtmlEdit                =  require('./HtmlEditFrame.html');
+//Ractive.components.Grid                    =  require('/components./Grid.html');
+//Ractive.components.settings                =  require('/components./settings.html');
+//Ractive.components.Companies               =  require('/components./Companies.html');
+//Ractive.components.Company                 =  require('/components./Company.html');
+Ractive.components.Login                   =  require('./components/Login.html');
+//Ractive.components.AddNewCompany           =  require('./components/AddNewCompany.html');
+//Ractive.components.FaqCategories           =  require('./components/FaqCategories.html');
+//Ractive.components.FaqCategory             =  require('./components/FaqCategory.html');
+//Ractive.components.FaqQuestions            =  require('./components/FaqQuestions.html');
+//Ractive.components.FaqQuestion             =  require('./components/FaqQuestion.html');
+//Ractive.components.Users                   =  require('./components/Users.html');
+Ractive.components.TGrid                   =  require('./components/TGrid.html');
+Ractive.components.TDetails                =  require('./components/TDetails.html');
+Ractive.components.TDetailsSingle          =  require('./components/TDetailsSingle.html');
+Ractive.components.ImageBrowser            =  require('./components/ImageBrowser.html');
+Ractive.components.Schema                  =  require('./components/Schema.html');
+Ractive.components.SchemaNew               =  require('./components/SchemaNew.html');
+Ractive.components.SchemaFiledAdd          =  require('./components/SchemaFiledAdd.html');
+Ractive.components.map                     =  require('./components/map.html');
+//Ractive.components.HtmlEdit                =  require('./components/HtmlEdit.html');
+Ractive.components.HtmlEdit                =  require('./components/HtmlEditFrame.html');
 GLOBALHtmlEditCounter = 1;
-Ractive.components.Selectize               =  require('./Selectize.html');
-Ractive.components.ShowImage               =  require('./ShowImage.html');
+Ractive.components.Selectize               =  require('./components/Selectize.html');
+Ractive.components.ShowImage               =  require('./components/ShowImage.html');
 Ractive.components.UserList                =  require('./user/UserList.html');
 Ractive.components.UserDetail              =  require('./user/UserDetail.html');
-Ractive.components.About                   =  require('./About.html');
-Ractive.components.TGridNested             =  require('./TGridNested.html');
-Ractive.components.Cropper                  =  require('./Cropper.html');
-//Ractive.components.Gallery                  =  require('./Gallery.html');
-Ractive.components.Gallery                  =  require('./Gallery2.html');
-Ractive.components.Gallery2single           =  require('./Gallery2single.html');
-Ractive.components.Init           =  require('./Init.html');
-
+Ractive.components.About                   =  require('./components/About.html');
+Ractive.components.TGridNested             =  require('./components/TGridNested.html');
+Ractive.components.Cropper                  =  require('./components/Cropper.html');
+//Ractive.components.Gallery                  =  require('./components/Gallery.html');
+Ractive.components.Gallery                  =  require('./components/Gallery2.html');
+Ractive.components.Gallery2single           =  require('./components/Gallery2single.html');
+Ractive.components.Init           =  require('./components/Init.html');
+var package = require('./package.json');
+window.version = package.version
 //document.addEventListener("deviceready", onDeviceReady, false);
 //if (!window.cordova) onDeviceReady()
 //async function onDeviceReady() {
-    console.log('onDeviceReady')
+    //console.log('onDeviceReady')
 //    var localforage = require('localforage')
 //    window.localforage = localforage;
 //    var db = localforage.createInstance()

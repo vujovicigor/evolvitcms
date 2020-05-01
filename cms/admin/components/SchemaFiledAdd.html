@@ -1,0 +1,254 @@
+<section xx class="componentSection">
+    <grid style="flex:1; overflow:auto;">
+        <div col='1/1'>
+            <label style="width:14em">Field name</label>
+            <input readonly={{update}} style="width:calc(99% - 14em)" type="text" placeholder="only letters and _" value={{row.field_name}}>
+        </div>
+        <div col='1/1'>
+            <label style="width:14em">Nice name</label>
+            <input style="width:calc(99% - 14em)" type="text" placeholder="" value={{row.nice_name}}>
+        </div>
+        <div col='1/1'>
+            <label style="width:14em">Placeholder</label>
+            <input style="width:calc(99% - 14em)" type="text" placeholder="placeholder, like this one" value={{row.placeholder}}>
+        </div>
+        <div col='1/1'>
+            <label style="width:14em">Tooltip</label>
+            <input style="width:calc(99% - 14em)" type="text" placeholder="" value={{row.tooltip}}>
+        </div>
+        <div col='1/1'>
+            <label style="width:14em">Sort</label>
+            <input style="width:calc(99% - 14em)" type="number" placeholder="Display order" value={{row.field_sort}}>
+        </div>
+
+        <div col='1/3'>
+            <Checkbox id="visiblegrid" checked={{row.visible}}></Checkbox>
+            <label for="visiblegrid">Show on grid</label>
+        </div>
+        <div col='1/3'>
+            <Checkbox id="visibledetails" checked={{row.visible_details}}></Checkbox>
+            <label for="visibledetails">Show on details</label>
+        </div>
+        <div col='1/3'>
+            <Checkbox id="Searchable" checked={{row.filter}}></Checkbox>
+            <label for="Searchable">Searchable</label>
+        </div>
+
+        <div col='1/1'>
+            <label style="width:14em">Default value</label>
+            <input style="width:calc(99% - 14em)" type="text" placeholder="" value={{row.default_value}}>
+        </div>
+        <div col='1/1'>
+            <label style="width:14em">Type</label>
+            <select style="width:calc(99% - 14em); display: inline;" value='{{row.field_type}}'>
+                {{#each types:key}}
+                    <option value='{{.myname}}'>{{.myname}}</option>
+                {{/each}}
+            </select>                
+        </div>
+                
+        {{#if row.field_type=='SLUG' }}
+        <div col='1/1'>
+            <label style="width:14em">Slug from</label>
+            <Select style="display: inline-block; width:calc(99% - 14em);" url="?query=_engine_schema_column&table_name={{table_name}}" value={{row.lookup_field}} labelf="label" valuef="compId" >
+                <option disabled selected value="" >Pick</option>
+            </Select>
+        </div>
+        {{/if}}
+
+        {{#if row.field_type=='CHILD' }}
+        <div col='1/1'>
+            <label style="width:14em">Lookup table</label>
+            <Select style="display: inline-block; width:calc(99% - 14em);" url="?query=_cms_tables_list_get" value={{row.lookup_table}} labelf="name" valuef="name" >
+                <option disabled selected value="" >Pick</option>
+            </Select>
+        </div>
+        {{/if}}
+
+        {{#if row.field_type=='IMAGE' }}
+        <div col='1/1'>
+            <label style="width:14em">Aspect ratio</label>
+            <input style="width:calc(99% - 14em)" type="text" placeholder="16:9, 2:1, 0.5, 3,..." value={{row.aspect_ratio}}>
+        </div>
+        {{/if}}
+
+        {{#if row.field_type=='DROPDOWN' || row.field_type=='MULTISELECT' }}
+        <div col='1/1'>
+            <label style="width:14em">Lookup table</label>
+            <Select style="display: inline-block; width:calc(99% - 14em);" url="?query=_cms_tables_list_get" value={{row.lookup_table}} labelf="name" valuef="name" >
+                <option disabled selected value="" >Pick</option>
+            </Select>
+        </div>
+        <div col='1/1'>
+            <label style="width:14em">Lookup field ({{row.lookup_field}})</label>
+            <Select style="display: inline-block; width:calc(99% - 14em);" url="?query=_engine_schema_column&table_name={{row.lookup_table}}" value={{row.lookup_field}} labelf="label" valuef="compId" >
+                <option disabled selected value="" >Pick</option>
+            </Select>
+        </div>
+        {{/if}}
+
+        <div col='1/1' style="display:flex">
+            <label style="width:14em">Grid width</label>
+            <input style="width:calc(99% - 14em)" type="text" placeholder="20%, 13rem,..." value={{row.w}}>
+        </div>        
+
+        <div col='1/1' style="display:flex">
+            <label style="width:14em">Grid template</label>
+            <textarea style="width:calc(99% - 14em)" type="text" placeholder="formatNumber(viewport[i][.compId])..." value={{row.template}}></textarea>
+        </div>        
+    </grid>
+    <div xx class="buttonBar">
+        <button style="visibility: {{update?'':'hidden'}};" disabled={{row.field_name=='id'}} on-click="@this.fire('delete')">Delete</button>
+        <button primary style="width: 14rem;" on-click="save">{{update?'Save Changes':'Save'}}
+        </button>    
+    </div>
+            
+</section>
+
+<style>
+
+.componentSection {
+    flex:1; 
+    padding-bottom:0; 
+    padding:1rem; 
+    overflow:auto; 
+    display:flex; 
+    flex-flow:column; 
+    height:100%
+}
+.buttonBar{
+    display:flex; 
+    justify-content: space-between; 
+    margin-top: 2rem;
+}
+.subheader {
+    color: var(--primary);
+    font-size: 1.8rem;
+}    
+.hr{
+    flex: 1; background: 1px var(--primary);height: 1px;margin-left: 0.5rem;
+}
+</style>
+<script>
+    component.exports = {
+    onrender: function () {
+        var self = this;
+        this.focusFirstElement();
+
+        //console.log('update', self.get('update'))
+        SFA = this;
+
+        this.on('get_next_sort', async function(){
+            var [resp, err] = await fetch2('?query=_engine_schema_column_next_sort_get&table_name=' + self.get('table_name'))
+            if (resp) {
+                self.set('row.field_sort', resp.next_sort);
+            }
+        })
+        if (!self.get('update')) self.fire('get_next_sort');
+
+        this.on('delete', async function(){
+            var [resp, err] = await fetch2('?query=_engine_schema_column&_action=delete', self.get('row'))
+            if (resp) {
+                if (self.parent) self.parent.fire('refresh');
+                self.root.fire('refresh');
+                izitoast.info({ message: 'Field removed'});
+                self.set('show', false);
+            }
+        })
+        
+        this.on('save', async function(){
+            var field_name = self.get('row.field_name');
+            if (!field_name) {
+                izitoast.error({ message: 'Enter Field name'}); return;
+            } 
+            if (!field_name.match(/^[a-zA-Z][a-zA-Z0-9_]*$/)) {
+                izitoast.error({ message: "Field name must have only letters,numbers and _ and can't start with number"}); return;
+            }
+            if ( self.get('row.field_type')=='DROPDOWN' || self.get('row.field_type')=='MULTISELECT' ) {
+                if ( !self.get('row.lookup_table') ) {
+                    izitoast.error({ message: "For filed type 'DropDown' you must pick 'lookup table'"}); return;
+                }
+                if ( !self.get('row.lookup_field') ) {
+                    izitoast.error({ message: "For filed type 'DropDown' you must pick 'lookup field'"}); return;
+                }
+            }
+
+            if (self.get('row.aspect_ratio')){
+              var aspect_ratio_str = self.get('row.aspect_ratio');
+              if (!isNaN(aspect_ratio_str)) self.set('row.aspect_ratio', Number(aspect_ratio_str) ) // hm, ovo mozda i ne mora, sqlite-u je svejedno
+              else {
+                var isSlash = aspect_ratio_str.includes("/");
+                var isCol = aspect_ratio_str.includes(":");
+                if (isSlash || isCol) {
+                  var ar2 = aspect_ratio_str.split(isSlash?'/':':');
+                  try{
+                    self.set('row.aspect_ratio', Number(ar2[0]) / Number(ar2[1]) )
+                  } catch(e){}
+                }
+              }
+
+            }
+            
+            if ( !self.get('row.nice_name') ) self.set('row.nice_name', self.get('row.field_name') )
+
+            var servicename = self.get('update')?'update':'insert'; 
+            var table_name = self.get('table_name');
+            self.set('row.table_name', table_name)
+            var o = self.get('row');
+            var field_type = o.field_type;
+            o.sqlite_field_type = self.get('types.'+field_type+'.sqlitename');
+            var [resp, err] = await fetch2('?query=_engine_schema_column&_action='+servicename, o)
+            if (resp) {
+                if (self.parent) self.parent.fire('refresh');
+                self.root.fire('refresh');
+                izitoast.info({ message: 'Field saved'});
+                self.set('show', false);
+            }
+        })
+    
+    },        
+    data:function() {
+        return {
+            G:{}
+            , tablename:''
+            , show:false
+            , update:false
+            , types:{
+                'TEXT': {sqlitename:'TEXT', myname:'TEXT'} ,
+                'SLUG': {sqlitename:'TEXT', myname:'SLUG'} ,
+                'LONGTEXT': {sqlitename:'TEXT', myname:'LONGTEXT'} ,
+                'IMAGE': {sqlitename:'TEXT', myname:'IMAGE'} ,
+                'DATE': {sqlitename:'TEXT', myname:'DATE'} ,
+                'COLOR': {sqlitename:'TEXT', myname:'COLOR'} ,
+                'GPS': {sqlitename:'TEXT', myname:'GPS'} ,
+                'NUMERIC': {sqlitename:'NUMERIC', myname:'NUMERIC'} ,
+                'INTEGER': {sqlitename:'INTEGER', myname:'INTEGER'} ,
+                'CHECKBOX': {sqlitename:'TEXT', myname:'CHECKBOX'} ,
+                'RANGE': {sqlitename:'NUMERIC', myname:'RANGE'} ,
+                'DROPDOWN': {sqlitename:'INTEGER', myname:'DROPDOWN'} ,
+                'MULTISELECT': {sqlitename:'TEXT', myname:'MULTISELECT'} ,
+                'HTMLEDIT': {sqlitename:'TEXT', myname:'HTMLEDIT'},
+                'CHILD': {sqlitename:'TEXT', myname:'CHILD'}
+            }
+            , row:{
+                table_name:''
+                , field_name:''
+                , nice_name:''
+                , field_type:'TEXT'
+                , placeholder:''
+                , tooltip:''
+                , field_sort:''
+                , default_value:''
+                , lookup_table:''
+                , lookup_field:'' 
+                , template:''
+                , visible:true
+                , visible_details:true
+                , filter:true
+                , aspect_ratio:null
+
+            }
+        }
+    }
+};
+</script>

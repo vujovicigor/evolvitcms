@@ -1,0 +1,120 @@
+<div style="flex:1; overflow:auto; display: flex; justify-content: start; flex-flow: row wrap; height: 300px; border: solid 1px #eee;">
+
+  <div class="cardholder" on-tap="@this.fire('showFileBrowse')" id="browse" >
+    <card style="padding:0">
+      <button style="height: 100%; margin: 0; font-size: 1.4em;">
+        <i class="glyphicon glyphicon-plus"></i> ADD
+      </button>
+    </card>
+  </div>
+
+  {{#each rows:ix}}
+  <div decorator='sortable' class="cardholder" >
+      <card style="position:relative">
+          <div xx class="img" style="background-image:url('{{HOSTNAME}}image.php?id={{.url}}&forcethumb')">
+          </div>
+          <textarea value={{.label}} class="carddesc" placeholder="Image label"></textarea>
+          <button type="button" on-tap="splice('rows', ix, 1)" style="position: absolute; right:0; top:0; margin-right: 0; margin-bottom: 0;border-radius: 50%; padding: 0.9rem 0.9rem;" >
+            <i class="glyphicon glyphicon-remove"></i>
+          </button>                
+
+      </card>
+  </div>
+  {{/each}}
+  
+<!--
+  <button id="browse" style="width: 14rem;" on-click="@this.fire('showFileBrowse')">ADD
+  </button>    
+-->
+
+</div>
+
+
+{{#if showFileBrowse}}
+<modal show="{{showFileBrowse}}" zoomFrom="browse" title="Browse" 
+class="animated fadeInRight" showOverlay="{{true}}" style="
+height: 44em;
+width: 50em;
+left: calc(50% - 25em);
+right: inherit;
+top: calc(50% - 22em);
+bottom: inherit;" >
+    <ImageBrowser G={{G}} path="{{new_img}}" show="{{showFileBrowse}}" aspect_ratio={{aspect_ratio}}></ImageBrowser>
+</modal>
+{{/if}}
+
+
+<style>
+.cardholder{ 
+  margin:1rem;
+  width:200px;
+}
+
+card {
+  text-align: center;
+  height: 220px;
+  transition: box-shadow 1s;
+  background: rgba(255,255,255,0);
+}
+card:hover {
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,1);
+}
+.carddesc{
+  height: 54px;
+  overflow: auto;
+  overflow-wrap: break-word;
+  border: 1px solid rgb(238, 238, 238);
+  margin: 0px;
+  resize: none;
+}
+.img{
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  width: 100%;
+  height: 144px;
+  margin-bottom: 1rem;   
+}
+</style>
+<script>
+component.exports = {
+  onteardown: function(){
+      //console.log('imgbroews teardown', this)
+  }
+  ,onrender: function () {
+      var self = this;
+      Gallery = this
+      self.set('HOSTNAME', HOSTNAME);
+
+      this.on('showFileBrowse', function(){
+        self.set('showFileBrowse', true)
+      })
+
+      this.observe('new_img', function(n,o,k,i){
+        //console.log('new_img', n,o,k,i)
+        if (!n) return;
+        if (!self.get('rows')) self.set('rows',[])
+
+        var newItem = [{url:n, label:''}]
+        tmp_rows = newItem.concat(self.get('rows'))
+        self.set('rows', tmp_rows)
+
+        setTimeout(function(){ self.set('new_img', null) },0)
+
+        //self.push('rows', {url:n, label:''})
+        //self.unshift('rows', {url:n, label:''})
+      },{init:false})
+  },        
+  data:function() {
+      return {
+        G:null,
+        rows:[], // {url:'', label:''},...
+        aspect_ratio:null,
+        showFileBrowse:false,
+        new_img:null
+      }
+    }
+  };
+  </script>
+
+

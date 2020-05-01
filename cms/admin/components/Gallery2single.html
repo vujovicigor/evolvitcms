@@ -1,0 +1,456 @@
+<section id="dropArea" xx  class="componentSection" style="transition: border 2s; border: dashed {{drag?'4px #689':'4px #fff'}}">
+    <!--
+      <div  style="display: flex;align-items: center;padding-bottom: 0; padding-top: 2rem;padding-bottom: 1rem; text-align: center;justify-content: center;">
+          <input type="file" multiple name="file" id="inputfile" class="inputfile">
+          <label class="upload" for="inputfile" >Upload file here</label>
+           <span style="padding: 1rem;"> OR </span>     
+          <div class="upload" style="border:dashed 1px var(--primary)" xx> Drag & Drop files here</div>
+      </div>
+    -->
+    <!--
+      <ul>
+        {{#rows}}
+          <li decorator='sortable'>{{.name}}</li>
+        {{/rows}}
+      </ul>  
+    -->
+    <!--
+      <div style="display: flex;align-items: center;padding-bottom: 12px; justify-content: center;">
+          <span class="subheader" xx>Select existing image</span>
+      </div>
+    
+      selectedfolder ti ne treba
+    -->
+      <div style="flex:1; overflow:auto; display: flex; justify-content: left; flex-flow: row wrap;">
+    
+          <div class="cardholder">
+            <card style="padding:0">
+              <input type="file" multiple name="file" id="inputfile{{GlobalIncrementer}}" class="inputfile">
+              <label class="upload" for="inputfile{{GlobalIncrementer}}">Upload</label>
+            </card>
+          </div>
+          
+          {{#if slug}}
+          <div  class="cardholder" on-click="@this.fire('imgSelect', slug)" >
+              <card style="position:relative" >
+                  <div style="text-align: center; height:3rem; overflow: auto;">
+                    {{slug}}
+                  </div>
+                  <div xx class="img" style="background-image:url('{{HOSTNAME}}image.php?id={{slug}}&forcethumb')">
+                  </div>
+                  <button type="button" class="remove_btn" on-tap="@this.set('slug', null)" xx  title="Remove file">
+                    <i class="glyphicon glyphicon-remove"></i>
+                  </button>                  
+                  <a btn class="download_btn" href="{{HOSTNAME}}image.php?id={{.slug}}" title="Download file" download="{{.slug}}" xx >
+                      <i class="glyphicon glyphicon-download-alt"></i>
+                  </a>                
+              </card>
+          </div>
+          {{/if}}
+
+    
+      </div>
+      <!--
+      <div xx class="buttonBar">
+          <button disabled={{imgSelect?false:true}} on-click="delete" style="margin: 0;">Delete file
+          </button>    
+          {{#if show_confirm_btn}}
+          <button primary style="width: 14rem;" on-click="confirm" style="margin: 0;">Confirm
+          </button>    
+          {{/if}}
+      </div>
+    -->    
+    </section>
+    
+    {{#if showFullScreen}}
+    <modal show="{{showFullScreen}}" zoomFrom="ib{{showFullScreenObj.id}}" cw="{{cw}}" title="{{showFullScreenObj.name}}" showOverlay="{{true}}" style="
+    height: calc(100% - 6rem);
+    width: 100%;
+    left: 0;
+    right: inherit;
+    top: 6rem;
+    bottom: inherit;" >
+      <ShowImage show="{{showFullScreen}}" imgObj={{showFullScreenObj}} ></ShowImage>
+    </modal>
+    {{/if}}
+    
+    
+    
+    {{#if showCropperModal}}
+    <modal show="{{showCropperModal}}"  cw="{{cw}}" title="{{showFullScreenObj.name}}" showOverlay="{{true}}" style="
+    height: calc(100% - 6rem);
+    width: 100%;
+    left: 0;
+    right: inherit;
+    top: 6rem;
+    bottom: inherit;" >
+      <div style="width:100; height:calc(100% - 40px)">
+        <img style="max-width: 100%;" id="cropperImage" src="../images/word.png">
+      </div>
+      <div xx class="buttonBar" style="position: absolute; bottom: 0; left:0; right:0">
+        <button primary style="width: 100%;" on-click="uploadFromCropper" style="margin: 0;">Save & Upload
+        </button>    
+      </div>  
+    </modal>
+    {{/if}}
+    
+    
+    <style>
+    .cardholder:hover .remove_btn{
+      opacity:1;
+    }
+    .cardholder:hover .download_btn{
+      opacity:1;
+    }
+    .download_btn{
+      opacity:0;
+      position: absolute; 
+      left:0; 
+      top:0; 
+      margin-left: 0; 
+      margin-bottom: 0;
+      border-radius: 50%; 
+      padding: 0.9rem 0.9rem;
+      color: var(--primary);
+    }
+    .remove_btn {
+      opacity:0;
+      position: absolute; 
+      right:0; 
+      top:0; 
+      margin-right: 0; 
+      margin-bottom: 0;
+      border-radius: 50%; 
+      padding: 0.9rem 0.9rem;
+    }
+    
+    .tag {
+    cursor: pointer;
+    }
+    .tag:hover, .selectedfolder {
+    background-color: var(--primary);
+    color: #ffffff;
+    }
+    .cardholder{ 
+      margin:1rem;
+      margin-left: 0;
+      width:200px;
+    }
+    .upload {
+      height: 100%;
+      width: 100%;
+      margin: 0px;
+      display: flex;
+      font-size: 2rem;
+      flex-flow: column;
+      justify-content: center;
+    
+      cursor: pointer;
+      color: var(--primary);
+      padding: 1.4rem 2rem;
+      background: #fff;
+      border: 1px solid var(--primary);
+      border-radius: 2px;
+      box-shadow: 0 0 0 transparent;
+      text-transform: uppercase;
+      text-decoration: none;
+      text-align: center;
+      font-weight: 700;
+      line-height: 1rem;
+      -webkit-appearance: none;
+    }
+    .upload:hover {
+      box-shadow: 2px 2px 4px rgba(0,0,0,.3);
+      background: #f4f5f6;
+    }
+    
+    .inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+    }    
+    
+    card {
+      text-align: center;
+      height: 160px;
+      transition: box-shadow 1s;
+      background: rgba(255,255,255,0);
+      padding-top: 0;
+    }
+    card:hover {
+      box-shadow: 0 1px 4px 0 rgba(0,0,0,1);
+    }
+    .carddesc{
+      height: 54px;
+      overflow: auto;
+      overflow-wrap: break-word;
+      border: 1px solid rgb(238, 238, 238);
+      margin: 0px;
+      resize: none;  
+    }
+    .img{
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: contain;
+      width: 100%;
+      height: 144px;
+      margin-bottom: 1rem;   
+    }
+    
+    .componentSection {
+      flex:1; 
+      padding-bottom:0; 
+      padding: 0.1rem; 
+      overflow:auto; 
+      display:flex; 
+      flex-flow:column; 
+      height:100%;
+      max-width: unset;
+    }
+    .buttonBar{
+      display:flex; 
+      justify-content: space-between; 
+      margin-top: 1rem;
+    }
+    .subheader {
+      color: var(--primary);
+      font-size: 1.8rem;
+      margin-right: 0.5rem;
+      margin-left: 0.5rem;    
+    }    
+    .hr{
+      flex: 1; background: 1px var(--primary);height: 1px;
+    }
+    </style>
+    <script>
+    component.exports = {
+      onteardown: function(){
+          //console.log('imgbroews teardown', this)
+          this.nodes.dropArea.removeEventListener("dragover", this.handleDragover, false);
+          this.nodes.dropArea.removeEventListener("dragleave", this.handleDragleave, false);
+          this.nodes.dropArea.removeEventListener("dragenter", this.handleDragenter, false);
+      }
+      ,onrender: function () {
+          var self = this;
+          var g_ix=0;
+          var g_files;
+    
+          var cropper;
+          self.set('HOSTNAME', HOSTNAME);
+    //      self.set('show_confirm_btn', !(self.root == self.parent) );
+          self.set('imgSelect', self.get('path'))
+    
+    
+          this.on('showFullScreen', function(o){
+              self.set('showFullScreenObj', o);
+              self.set('showFullScreen', true);
+              //{{HOSTNAME}}image.php?id={{id}}
+          })
+          //this.focusFirstElement();
+          this.handleDragenter = function (e) {
+              //console.log('Dragenter')
+              self.set('drag', true)
+          }
+          this.handleDragleave = function (e) {
+              self.set('drag', false)
+          }
+    
+          this.handleDrop = function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              let dt = e.dataTransfer;
+              let files = dt.files;
+              self.fire('upload', files);
+              self.set('drag', false)
+              return false;
+          }
+          this.handleDragover = function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              self.set('drag', true)
+              return false;
+          }
+    
+          this.nodes.dropArea.addEventListener('drop', this.handleDrop, false);
+          this.nodes.dropArea.addEventListener('dragover', this.handleDragover, false);
+          this.nodes.dropArea.addEventListener('dragleave', this.handleDragleave, false);
+          this.nodes.dropArea.addEventListener('dragenter', this.handleDragenter, false);
+          
+          this.nodes['inputfile'+self.get('GlobalIncrementer')].onchange = function() {
+              self.fire('upload')
+          };        
+          //this.singleUpload = function(file){}
+    
+          function add_file(slug){
+            self.set('slug', slug)        
+          }
+    
+          this.on('uploadFromCropper', async function(){
+            cropper.getCroppedCanvas().toBlob(async (blob) => {
+              var data = new FormData()
+              data.append('file', blob, self.get('lastFileName'));
+              data.append('selectedfolder', self.get('selectedfolder'))
+    
+              resp = await fetch(HOSTNAME+'uploadfile.php', {
+                  method: 'POST',
+                  credentials:'same-origin',
+                  //'Content-Type': 'application/json',
+                  body: data
+              })
+              //.then(function(resp){
+                  //console.log('up resp',resp)
+              izitoast.success({ message: 'File uploaded.'});
+                  //self.fire('refresh')
+                  
+              if (resp) resp.text().then(function(id){
+                  //console.log('iidd uploada',id)
+                  self.set('imgSelect', id)
+                  add_file(id)
+                  self.set('showCropperModal', false).then(function(){
+                    prepareCropperCanvas(false,false) // next image
+                  })
+    
+                  self.set('path', id)
+                  //console.log('imgSelect',r)
+                  //if (self.parent) self.parent.fire('path', id);
+                  //self.set('show', false)          
+                })
+              //self.fire('refresh')
+            }, 'image/jpeg', 0.75)
+          })
+    
+    
+          function prepareCropperCanvas(files, start){
+            if (start){ g_files = files, g_ix=0}
+            if (!g_files) return
+            if (g_files.length==0) return
+            if (!start) g_ix++
+            if (g_ix >= g_files.length ) return
+    
+            self.set('showCropperModal',true).then(function(){
+              const image = self.nodes.cropperImage;
+              var FR= new FileReader();
+              FR.onload = function(e) {
+                //var img = new Image();
+                //img.addEventListener("load", function() {
+                //  context.drawImage(img, 0, 0);
+                //});
+                image.src = e.target.result;
+                cropper = new window.Cropper(image, {
+                  aspectRatio: self.get('aspect_ratio'),
+                  viewMode:1, //restrict the crop box to not exceed the size of the canvas.
+                  dragMode:'move',
+                  autoCropArea:1,
+                  /*
+                  crop(event) {
+                    console.log(event.detail.x);
+                    console.log(event.detail.y);
+                    console.log(event.detail.width);
+                    console.log(event.detail.height);
+                    console.log(event.detail.rotate);
+                    console.log(event.detail.scaleX);
+                    console.log(event.detail.scaleY);
+                  },
+                  */
+                });                     
+              };       
+    
+              FR.readAsDataURL( g_files[g_ix] );
+              self.set('lastFileName', g_files[g_ix].name)    
+            })
+          }
+    
+    
+          this.on('upload', async function(files){
+              //console.log(e)
+              if (!files){
+    //                var input = document.querySelector('input[type="file"]');
+                  var input = self.nodes['inputfile'+self.get('GlobalIncrementer')];
+                  files = input.files;
+                  //data.append('file', input.files[0])
+              }
+              if (!files || files.length==0) return; // let sort decorator do his thing
+    
+              var aspect_ratio = self.get('aspect_ratio')
+              if (aspect_ratio){
+                //console.log('caling prepareCropperCanvas')
+                prepareCropperCanvas(files, true)
+                return
+              }
+    
+              izitoast.info({ message: 'Uploading to server, please wait...'});
+              var resp;
+              for (var i=0; i<files.length;i++){
+                var data = new FormData()
+                data.append('file', files[i]);
+                data.append('selectedfolder', self.get('selectedfolder'))
+  
+                resp = await fetch(HOSTNAME+'uploadfile.php', {
+                    method: 'POST',
+                    credentials:'same-origin',
+                    //'Content-Type': 'application/json',
+                    body: data
+                })
+                //.then(function(resp){
+                    //console.log('up resp',resp)
+                izitoast.success({ message: 'File '+(i+1)+' of '+ files.length+' uploaded.'});
+                var slug = await resp.text()
+                self.set('imgSelect', slug)
+                add_file(slug)
+                    //self.fire('refresh')
+                      
+              }
+
+          })
+    
+    
+          this.observe('selectedfolder', function(n){
+            self.fire('refresh');
+          }, {init:false})
+    
+          this.on('file_folder_update', function(folder_id, id){
+            //console.log(folder_id, id);
+            //var [resp, err] = await fetch2('?query=file_folder_update&folder_id='+folder_id+'&id='+id);
+          })
+    
+          this.on('imgSelect', function(r){
+              //console.log('imgSelect',r)
+              self.set('imgSelect', r)
+          })
+    /*
+          this.on('confirm', function(r){
+              self.set('path', self.get('imgSelect'))
+              //console.log('imgSelect',r)
+              if (self.parent) self.parent.fire('path', self.get('imgSelect'));
+              self.set('show', false)
+          })
+    */      
+
+    
+      },        
+      data:function() {
+              return {
+                  G:null,
+                  //rows:[],
+                  slug:null,
+                  path:null,
+                  aspect_ratio:null,
+                  imgSelect:null,
+                  drag:false,
+                  showFullScreen:false,
+                  showFullScreenObj:{},
+                  show_confirm_btn:true,
+                  selectedfolder:0,
+                  showCropperModal:false,
+                  lastFileName:'',
+                  GlobalIncrementer: GlobalIncrementer++
+              }
+          }
+      };
+      </script>
+    
+    
+    

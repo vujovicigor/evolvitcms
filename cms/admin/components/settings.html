@@ -1,0 +1,31 @@
+
+<section style="flex:1; padding-bottom:0; padding-top:0; overflow:auto">
+
+    <input type="checkbox" id="debug_mode" checked={{debug_mode}} on-click="dmClick"> 
+    <label for="debug_mode">Debug mode is {{debug_mode?'ON':'OFF'}}</label>
+
+</section>
+
+
+<script>
+    component.exports = {
+    onrender: async function () {
+        var self = this;
+        var [resp,err] = await fetch2('api/v2/SA_debug_mode_get')
+        if (resp) self.set('debug_mode', resp.results);
+        this.on('dmClick', async function(){
+            //console.log('klik')
+            var debug_mode = self.get('debug_mode')
+            var [resp,err] = await fetch2('api/v2/SA_debug_mode_set', {debug_mode:!debug_mode})
+            if (resp) self.set('debug_mode', resp.results);
+        })
+    },        
+    data:function() {
+            return {
+                G:null
+                , debug_mode:null
+            }
+        }
+
+    };
+</script>

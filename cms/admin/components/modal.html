@@ -1,0 +1,391 @@
+{{#if showOverlayTRUE}}
+<div class="roverlay" on-tap="cmdCloseOnBackgroundTap" id="roverlay" style="opacity:{{opacity}}"></div>
+{{/if}}
+<div class="modal rmodal {{!showOverlayTRUE?'rmodalShowOverlay':''}} {{class}}" 
+style="{{style}}; {{#if left!==null}}left:{{left}}px; top:{{top}}px;{{/if}} opacity:{{opacity}}" 
+id="rmodalm" >
+
+{{#if showHeader}}
+  <div class="modal-header rmodal-head noselect" on-pan="onpan" on-panstart="onpanstart" style="{{isFullScreen?'':'cursor: move'}}">
+
+    <h4 class="modal-title" xx>
+        <span class="modal-title-span" >{{title}}</span>
+
+        <button aria-label="Close" type="button" on-click="@this.fire('close', @this.event)" style="float:right; margin-bottom: 0;border-radius: 50%;margin-right: 0; padding: 0.9rem 0.9rem;">
+            <i class="glyphicon glyphicon-remove">
+            </i>
+        </button>
+        {{#if !ISMOBILE}}
+        <button aria-label="Close" type="button" on-tap="toggleFullScreen" style="float:right;margin-right: 1em; margin-bottom: 0;border-radius: 50%; padding: 0.9rem 0.9rem;" >
+            <i class="glyphicon glyphicon-fullscreen">
+            </i>
+        </button>
+        {{/if}}
+    </h4>    
+  </div>
+{{/if}}
+
+  <div class="modal-body rmodal-body" style="{{bodystyle}}">
+    {{yield}}
+    
+    {{#if !showHeader}}
+        <button aria-label="Close" type="button"  on-tap="@this.set('show', false)"
+        style="position:fixed; top:0; right:0;border-radius: 50%;padding: 4px;font-size: 1.6em;"><i class="fa fa-fw fa-close"></i></button>    
+    {{/if}}
+  </div>
+</div>
+{{#if zoomFromClone}}
+    <div style="transform: translateZ(0);z-index: 1041; position:fixed; border:solid 1px gray; left:{{zoomFromLeft}}px; top:{{zoomFromTop}}px ;width:100px;height:30px; background-color:white" id="grower">
+    {{#if showHeader}}
+      <div class="modal-header rmodal-head noselect"  id="growerHead" style="padding:0">
+      </div>
+    {{/if}}
+        
+        
+    </div>
+{{/if}}
+
+<style>
+.modal-title{
+    margin: 6px;
+    color: white;
+    line-height: 1.7;
+    height: 3.5rem;
+}
+.modal-title-span{
+    width: calc(100% - 10rem);
+    overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* overlay styles, all needed */
+.roverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,0.3);
+    z-index: 1040;
+/*    opacity:0; 
+    transition:opacity 0.4s ease; 
+    */
+}
+
+.rmodal {
+    width: 80%;
+    height: 80%;
+    position: fixed;
+    top: 10%; 
+    left: 10%;
+    background-color: #ffffff;
+    border-radius: 5px;
+    z-index: 1041; /* 1 higher than the overlay layer */
+    overflow: visible;
+     border: solid 1px gray ; 
+    box-shadow:6px 6px 6px #444;
+   /* padding: 4px; */
+    display:flex; 
+    flex-flow:column;
+/*    opacity:0; 
+    transition:opacity 0.4s ease; 
+    */
+}
+.rmodalShowOverlay{
+    box-shadow: 0 0 5px 2px #222;
+    z-index: 1040;
+}
+.rmodal-head {
+    /*border-bottom: 1px solid #ddd;
+    cursor: move;*/
+    background-color: var(--primary);
+}
+.rmodal-body {
+    flex:1;
+    overflow: auto;
+    max-height: none;
+    position:relative;
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* IE/Edge */
+  user-select: none;           /* non-prefixed version, currently
+                                  not supported by any browser */
+}
+</style>
+
+<script>
+    component.exports ={
+        onrender: function ( options ) {
+            var self = this;
+            var topLimit=60;
+            // test zoom in
+            //GLOBALMODAL=self.nodes.rmodalm;
+            
+            self.set('ISMOBILE', ISMOBILE);
+            /*
+            if (!ISMOBILE){
+                var top = $(self.nodes.rmodalm).css('top').split('px')[0] | 0;
+                if ( top < topLimit ) 
+                    $(self.nodes.rmodalm).css('top', ''+topLimit+'px'); 
+            }            
+*/
+            var zoomFrom = self.get('zoomFrom');
+            if (!ISMOBILE) self.set('zoomFromClone', zoomFrom)
+            //console.log('zoomFrom',zoomFrom);
+
+            this.on('close', function(e){
+                self.set('show', false);
+                return false
+            })
+//            if (zoomFrom && this.parent.nodes[zoomFrom]) zoomFrom = this.parent.nodes[zoomFrom];
+//            var fromCR = zoomFrom?$(zoomFrom)[0].getBoundingClientRect():null;
+            //console.log('zoomFrom',zoomFrom);
+            if (!ISMOBILE && zoomFrom){
+                //console.log('in zoom');
+                var fromCR = $('#'+zoomFrom)? $('#'+zoomFrom)[0].getBoundingClientRect():null;
+                self.set('opacity',0);
+                //var fromCR = $(zoomFrom)[0].getBoundingClientRect();
+                self.set('zoomFromLeft', fromCR.left );
+                self.set('zoomFromTop', fromCR.top );
+                //console.log(zoomFrom, fromCR);
+                var toCRRO = self.nodes.rmodalm.getBoundingClientRect();
+                toCR =  { top:toCRRO.top, bottom:toCRRO.bottom, right:toCRRO.right, left:toCRRO.left }
+                //console.log(toCR);
+                if (toCR.top < topLimit) toCR.top = topLimit;
+
+                setTimeout(function(){
+                    //console.log(self.nodes.grower.getBoundingClientRect());
+                    
+                    var myAnimation = anime({
+                        targets: self.nodes.grower,
+                        left: [fromCR.left, toCR.left],
+                        top: [fromCR.top, toCR.top],
+                        width: [fromCR.right-fromCR.left, toCR.right-toCR.left],
+                        height: [fromCR.bottom-fromCR.top, toCR.bottom-toCR.top],
+                        // borderRadius: ['50%', '0%'],
+                        duration: self.get('zoomDuration'),//170,
+                        loop: false,
+                        easing: 'easeInExpo',
+                        complete:function(){
+                            self.set('opacity',1);
+                            //self.animate('opacity',1,{duration:450, complete:function(){ self.set('zoomFrom',null);  }});
+                            self.set('zoomFromClone',null); 
+                            //self.nodes.grower.style.display="none"
+                        }
+                    });  
+                    
+                    if (self.nodes.growerHead)
+                    var myAnimation = anime({
+                        targets: self.nodes.growerHead,
+                        height: ['0px', '65px'],
+                        duration: self.get('zoomDuration'),//170,
+                        loop: false,
+                        easing: 'easeInExpo'
+                    });            
+                    
+                },1)
+
+            }
+
+
+            //self.set('offsetWidth',self.nodes.rmodalm.offsetWidth);
+            var w= self.nodes.rmodalm.offsetWidth;
+            var cw=1;
+            self.set('offsetWidth',w);
+            //if (w>(560+240*3)) cw=5;
+            //if (w<=(560+240*3)) cw=4;
+            if (w>(1024)) cw=3;
+            if (w<=(1024)) cw=2;
+            if (w<=560) cw=1;
+            self.set('cw',cw);
+            
+
+            var fs={};
+            var originY=0; originY=0;
+            if (ISMOBILE) {
+                if ($(document).height() < ( topLimit + Number($(self.nodes.rmodalm).css('top').split('px')[0]) + Number($(self.nodes.rmodalm).css('height').split('px')[0]) ) ) {
+                    $(self.nodes.rmodalm).css('top',''+topLimit+'px'); 
+                    $(self.nodes.rmodalm).css('height','calc(100% - '+topLimit+'px)'); 
+                }
+                $(self.nodes.rmodalm).css('left','0'); 
+                $(self.nodes.rmodalm).css('width','100%'); 
+            }
+            else {
+             //   $(self.nodes.rmodalm).css('top',''+topLimit+'px'); 
+
+            }
+
+/*
+            setTimeout(function(){
+                if (ISMOBILE) self.fire('toggleFullScreen') 
+
+                //self.set('opacity',1);
+//                $(self.nodes.rmodalm).css('opacity',1);
+//                $(self.nodes.roverlay).css('opacity',1);
+               // self.set('opacity',1);
+                //self.set('opacity',1);
+                
+            }, 1);
+            */
+            
+            self.on('toggleFullScreen', function(e){
+                //console.log('toggleFullScreen')
+               // self.toggle('isFullScreen');
+                if (ISMOBILE) $(self.nodes.rmodalm).css('transition','none')
+                else $(self.nodes.rmodalm).css('transition','left 0.3s ease 0s, top 0.3s ease 0s, width 0.3s ease 0s, height 0.3s ease 0s'); 
+               
+                if (self.get('isFullScreen')){
+                    $(self.nodes.rmodalm).css('left',fs.left); 
+                    $(self.nodes.rmodalm).css('top',fs.top); 
+                    $(self.nodes.rmodalm).css('width',fs.width); 
+                    $(self.nodes.rmodalm).css('height',fs.height); 
+                }
+                else{
+                    fs.left = $(self.nodes.rmodalm).css('left'); 
+                    fs.top = $(self.nodes.rmodalm).css('top'); 
+                    fs.width = $(self.nodes.rmodalm).css('width'); 
+                    fs.height = $(self.nodes.rmodalm).css('height'); 
+
+                    $(self.nodes.rmodalm).css('left','0'); 
+                    $(self.nodes.rmodalm).css('top',''+topLimit+'px'); 
+                    $(self.nodes.rmodalm).css('width','100%'); 
+                    $(self.nodes.rmodalm).css('height','calc(100% - '+topLimit+'px)'); 
+                }
+                self.toggle('isFullScreen');
+                if (window.MAP) window.MAP.invalidateSize();
+                setTimeout(function(){
+                    $(self.nodes.rmodalm).css('transition','none'); 
+                    
+                    // TODO: ponovljen  blok koda, sredi nekad
+                    var w= self.nodes.rmodalm.offsetWidth;
+                    var cw=1;
+                    self.set('offsetWidth',w);
+                    //if (w>(560+240*3)) cw=5;
+                    //if (w<=(560+240*3)) cw=4;
+                    if (w>(1024)) cw=3;
+                    if (w<=(1024)) cw=2;
+                    if (w<=560) cw=1;
+                    self.set('cw',cw);
+
+                },300);
+                
+                
+            })
+
+            self.on('onpanstart', function(e){
+                //ex=e
+                if (!self.get('isFullScreen')){
+                   // e.original.preventDefault();
+                    originX = parseFloat($(self.nodes.rmodalm).css('left').split('px')[0]); //self.get('left');
+                    originY = parseFloat($(self.nodes.rmodalm).css('top').split('px')[0]); //self.get('top');
+                }
+                //console.log(e); 
+                //console.log('originX:', originX,' originY:',originY); 
+
+                
+/*
+                var dx=e.original.deltaX;
+                var dy=e.original.deltaY;
+                console.log(e.original); 
+                self.set('left',dx);
+                self.set('top',dy);
+*/            });
+            
+            self.on('onpan', function(e){
+                //console.log(e);
+                if (!self.get('isFullScreen')){
+                    e.original.preventDefault();
+                    var dx=e.original.deltaX;
+                    var dy=e.original.deltaY;
+    //                var dx=e.original.center.x;
+    //                var dy=e.original.center.y;
+                    //console.log(e); 
+
+                    //self.set('left',dx+originX)
+                    if ((dx+originX)>1) self.set('left' ,dx+originX);
+                    else self.set('left',0);
+
+                    if ((dy+originY)>topLimit) self.set('top' ,dy+originY);
+                    else self.set('top', topLimit);
+
+                    var w = $(window).width()
+                    if ((dx+originX)>(w-150)) self.set('left',w-150);
+                    
+                    var h = $(window).height()
+                    if ((dy+originY)>(h-46)) self.set('top',h-46);
+                }
+
+                var w= self.nodes.rmodalm.offsetWidth;
+                var cw=1;
+                self.set('offsetWidth',w);
+                //if (w>(560+240*3)) cw=5;
+                //if (w<=(560+240*3)) cw=4;
+                if (w>(1024)) cw=3;
+                if (w<=(1024)) cw=2;
+                if (w<=560) cw=1;
+                self.set('cw',cw);
+                //console.log('w:',w);
+
+            });
+            
+            self.keydownhandler = function(e){
+                //console.log('keydownhandler');
+                if (e.keyCode==27){
+                    e.stopImmediatePropagation();
+                    if (self.get('closeOnBackgroundTap')){
+                       // self.fire('closeOnBackgroundTap', null, self);
+                        self.set('show', false);
+                    }
+                    return false;
+                }
+            }
+            //console.log(self.nodes.rmodal);
+            $('body').on( "keydown", self.keydownhandler );
+            
+            // Change binding order for jquery keydown event, 
+            // so last modal will receive keydown event first
+            // http://stackoverflow.com/questions/2360655/jquery-event-handlers-always-execute-in-order-they-were-bound-any-way-around-t
+            $('body').each(function() {
+                var handlers = $._data(this, 'events')["keydown"];
+                // take out the handler we just inserted from the end
+                var handler = handlers.pop();
+                // move it at the beginning
+                handlers.splice(0, 0, handler);
+            });
+
+            self.on('cmdCloseOnBackgroundTap', function(e, comp){
+                if (self.get('closeOnBackgroundTap')){
+                   // self.fire('closeOnBackgroundTap', null, self);
+                    self.set('show', false);
+                }
+                //console.log(e)
+                if (e && e.original && e.original.stopImmediatePropagation) e.original.stopImmediatePropagation();
+            });
+
+        },
+        onunrender: function ( options ) {
+          //console.log('onunrender');
+          $('body').off( "keydown", this.keydownhandler );
+        },
+        
+        data:function() { 
+            return { 
+                show:false, closeOnBackgroundTap:true, title:null, opacity:1
+                , left:null, top:null
+                , showOverlay:true
+                , showOverlayTRUE:true // True hardcoded               
+                , isFullScreen:false
+                , offsetWidth: 1000, cw:5, zoomFrom:null, zoomFromLeft:-100, zoomFromTop:-100
+                , showHeader:true
+                , zoomDuration:170
+                , ISMOBILE:false
+            }
+        }
+    }
+</script>

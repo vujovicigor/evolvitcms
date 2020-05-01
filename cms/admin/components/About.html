@@ -1,0 +1,23 @@
+
+<section style="flex:1; padding-bottom:0.5rem; padding-top:4.5rem; overflow:auto; text-align: center;">
+  <h2>EvolvitCMS</h2>
+  
+<!--
+<p>Author: <a href="mailto:vujovichigor@gmail.com">Igor Vujovic</a><p>
+  -->
+  <p><a href="https://evolvitcms.com" target="_blank">EvolvitCms.com</a><p>
+  <p><small>Version {{version}}</small><p>
+</section>
+<!--
+<Cropper></Cropper>
+-->
+<script>
+  component.exports = {
+    onrender: function () {},        
+    data:function() {
+            return {
+              version: window.version
+            }
+        }
+  };
+  </script>

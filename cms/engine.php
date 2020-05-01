@@ -4,7 +4,7 @@
     include(dirname(__FILE__).'/slug.php'); 
 
     try{
-        $db = new PDO('sqlite:'.dirname(__FILE__).'/db/baza2.sqlite');
+        $db = new PDO('sqlite:'.dirname(__FILE__).'/db/main.sqlite');
         $db->exec("ATTACH DATABASE '".dirname(__FILE__).'/db/userfiles.sqlite'."' AS userfiles");
     } 
     catch(PDOException $e) { 

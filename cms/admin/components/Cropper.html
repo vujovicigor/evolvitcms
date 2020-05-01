@@ -1,0 +1,47 @@
+<div>
+  <img style="max-width: 100%;" id="image" src="../images/word.png">
+</div>
+
+<style>
+img {
+  max-width: 100%; /* This rule is very important, please do not ignore this! */
+}
+</style>
+
+<script>
+  component.exports ={
+    onteardown: function(){
+
+    }
+    ,onrender: function(){
+        var self = this;
+
+        const image = self.nodes.image;
+        const cropper = new window.Cropper(image, {
+          aspectRatio: 16 / 9,
+          crop(event) {
+            /*
+            console.log(event.detail.x);
+            console.log(event.detail.y);
+            console.log(event.detail.width);
+            console.log(event.detail.height);
+            console.log(event.detail.rotate);
+            console.log(event.detail.scaleX);
+            console.log(event.detail.scaleY);
+            */
+          },
+        });
+        
+    },   // data:{code:null, fromParent:true}
+
+        data:function() { 
+            return {
+                 showFileBrowse:false
+                ,pathvarname:''
+                ,code:null
+                ,fromParent:true
+             }
+        }
+}
+
+</script>

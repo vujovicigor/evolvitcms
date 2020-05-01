@@ -1,0 +1,458 @@
+<section xx  class="componentSection" style="transition: border 2s; border: dashed {{drag?'8px #689':'8px #fff'}}">
+  <div id="dropArea" style="display: flex;align-items: center;padding-bottom: 0; padding-top: 2rem;padding-bottom: 1rem; text-align: center;justify-content: center;">
+      <input type="file" multiple name="file" id="inputfile" class="inputfile">
+      <label class="upload" for="inputfile" >Upload file here</label>
+       <span style="padding: 1rem;"> OR </span>     
+      <div class="upload" style="border:dashed 1px var(--primary)" xx> Drag & Drop files here</div>
+  </div>
+
+  <div style="display: flex; align-items: center; padding-top: 1rem; justify-content: center;margin-bottom: 0.5rem;">
+      <span class="hr"></span>
+      <span class="subheader" xx="">or Select existing image</span>
+      <span class="hr"></span>
+  </div>
+<!--
+  <ul>
+    {{#rows}}
+      <li decorator='sortable'>{{.name}}</li>
+    {{/rows}}
+  </ul>  
+-->
+<!--
+  <div style="display: flex;align-items: center;padding-bottom: 12px; justify-content: center;">
+      <span class="subheader" xx>Select existing image</span>
+  </div>
+-->
+<div style="max-height: 6rem; overflow: auto;">
+<tag on-dragndrop="DROP" data-folder_id ="0" xx class="tag {{(selectedfolder==0)?'selectedfolder':''}}" on-tap="@this.set('selectedfolder', 0)"> All </tag>
+{{#each folders}}
+  <tag on-dragndrop="DROP" data-folder_id ="{{.id}}" xx class="tag {{(selectedfolder==.id)?'selectedfolder':''}}" on-tap="@this.set('selectedfolder', .id)">{{.Name}}</tag>
+{{/each}}
+<tag id="showFoldersModal" xx class="tag" on-tap="@this.set('showFoldersModal', true)"><i class="glyphicon glyphicon-folder-open" ></i> Manage Folders</tag>
+</div>
+      <div style="flex:1; overflow:auto; display: flex; justify-content: space-around; flex-flow: row wrap;">
+      {{#each rows}}
+      <div class="cardholder" on-dblclick="confirm" on-click="@this.fire('imgSelect', .)" on-dragndrop="DRAG" draggable="true" data-id="{{.id}}">
+          <card style="{{imgSelect == .slug?'box-shadow: 0 1px 4px 0 rgba(0,0,0,1)':''}}; position:relative" id="ib{{.id}}">
+              <div style="text-align: center; height:3rem">
+                {{#if .folder_name}} <tag style="margin: 0">{{.folder_name}}</tag>{{/if}}
+              </div>
+              <div xx class="img" style="background-image:url('{{HOSTNAME}}image.php?id={{.slug}}&forcethumb')">
+              </div>
+              <p xx class="carddesc">{{.name}}</p>
+              <button type="button" on-tap="@this.fire('showFullScreen', .)" style="position: absolute; right:0; top:0; margin-right: 0; margin-bottom: 0;border-radius: 50%; padding: 0.9rem 0.9rem;" >
+                  <i class="glyphicon glyphicon-fullscreen"></i>
+              </button>                
+              <a btn href="{{HOSTNAME}}image.php?id={{.slug}}" download="{{.name}}" style="position: absolute; left:0; top:0; margin-left: 0; margin-bottom: 0;border-radius: 50%; padding: 0.9rem 0.9rem;color: var(--primary);" >
+                  <i class="glyphicon glyphicon-download-alt"></i>
+              </a>                
+          </card>
+      </div>
+      {{/each}}
+
+  </div>
+  <div xx class="buttonBar">
+      <button disabled={{imgSelect?false:true}} on-click="delete" style="margin: 0;">Delete file
+      </button>    
+      {{#if show_confirm_btn}}
+      <button primary style="width: 14rem;" on-click="confirm" style="margin: 0;">Confirm
+      </button>    
+      {{/if}}
+  </div>
+          
+</section>
+
+{{#if showFullScreen}}
+<modal show="{{showFullScreen}}" zoomFrom="ib{{showFullScreenObj.id}}" cw="{{cw}}" title="{{showFullScreenObj.name}}" showOverlay="{{true}}" style="
+height: calc(100% - 6rem);
+width: 100%;
+left: 0;
+right: inherit;
+top: 6rem;
+bottom: inherit;" >
+  <ShowImage show="{{showFullScreen}}" imgObj={{showFullScreenObj}} ></ShowImage>
+</modal>
+{{/if}}
+
+{{#if showFoldersModal}}
+<modal show="{{showFoldersModal}}" zoomFrom="showFoldersModal" title="Manage image folders" showOverlay="{{true}}" style="
+height: 34em;
+width: 24em;
+left: calc(50% - 12em);
+right: inherit;
+top: calc(50% - 17em);
+bottom: inherit;" >
+<TGrid G={{G}}  selected_tablename = "_Folders"></TGrid>
+</modal>
+{{/if}}
+
+{{#if showCropperModal}}
+<modal show="{{showCropperModal}}"  cw="{{cw}}" title="{{showFullScreenObj.name}}" showOverlay="{{true}}" style="
+height: calc(100% - 6rem);
+width: 100%;
+left: 0;
+right: inherit;
+top: 6rem;
+bottom: inherit;" >
+  <div style="width:100; height:calc(100% - 40px)">
+    <img style="max-width: 100%;" id="cropperImage" src="../images/word.png">
+  </div>
+  <div xx class="buttonBar" style="position: absolute; bottom: 0; left:0; right:0">
+    <button primary style="width: 100%;" on-click="uploadFromCropper" style="margin: 0;">Save & Upload
+    </button>    
+  </div>  
+</modal>
+{{/if}}
+
+
+<style>
+.tag {
+cursor: pointer;
+}
+.tag:hover, .selectedfolder {
+background-color: var(--primary);
+color: #ffffff;
+}
+.cardholder{ 
+  margin:1rem;
+  width:200px;
+}
+.upload {
+  width: 22rem;
+  margin: 0;
+  cursor: pointer;
+  color: var(--primary);
+  display: inline-block;
+  padding: 1.4rem 2rem;
+  background: #fff;
+  border: 1px solid var(--primary);
+  border-radius: 2px;
+  box-shadow: 0 0 0 transparent;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1rem;
+  -webkit-appearance: none;
+}
+.upload:hover {
+  box-shadow: 2px 2px 4px rgba(0,0,0,.3);
+  background: #f4f5f6;
+}
+
+.inputfile {
+width: 0.1px;
+height: 0.1px;
+opacity: 0;
+overflow: hidden;
+position: absolute;
+z-index: -1;
+}    
+
+card {
+  text-align: center;
+  height: 220px;
+  transition: box-shadow 1s;
+  background: rgba(255,255,255,0);
+  padding-top: 0;
+}
+card:hover {
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,1);
+}
+.carddesc{
+  height: 54px;
+  overflow: auto;
+  margin-bottom: 1rem;
+  overflow-wrap: break-word;
+}
+.img{
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  width: 100%;
+  height: 144px;
+  margin-bottom: 1rem;   
+}
+
+.componentSection {
+  flex:1; 
+  padding-bottom:0; 
+  padding:1rem; 
+  overflow:auto; 
+  display:flex; 
+  flex-flow:column; 
+  height:100%;
+  max-width: unset;
+}
+.buttonBar{
+  display:flex; 
+  justify-content: space-between; 
+  margin-top: 1rem;
+}
+.subheader {
+  color: var(--primary);
+  font-size: 1.8rem;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;    
+}    
+.hr{
+  flex: 1; background: 1px var(--primary);height: 1px;
+}
+</style>
+<script>
+component.exports = {
+  onteardown: function(){
+      //console.log('imgbroews teardown', this)
+      this.nodes.dropArea.removeEventListener("drop", this.handleDrop, false);
+      this.nodes.dropArea.removeEventListener("dragover", this.handleDragover, false);
+      this.nodes.dropArea.removeEventListener("dragleave", this.handleDragleave, false);
+      this.nodes.dropArea.removeEventListener("dragenter", this.handleDragenter, false);
+  }
+  ,onrender: function () {
+      var self = this;
+      var cropper;
+      self.set('HOSTNAME', HOSTNAME);
+      self.set('show_confirm_btn', !(self.root == self.parent) );
+      self.set('imgSelect', self.get('path'))
+
+      this.lastSourceF = null;
+      this.on('DRAG', async function(e) {
+        //console.log('source: ' + e.type, e.node)
+        if (e.type == 'start'){
+          self.lastSourceF = e.node
+          self.lastTargetF = null
+        }
+        if (e.type == 'end'){
+          //console.log('end',e )
+          self.lastSourceF = e.node;
+          if (self.lastTargetF) {
+            var id = self.lastSourceF.dataset.id;
+            var folder_id = self.lastTargetF.dataset.folder_id;
+            //console.log('SAD SNIMAJ')
+            //console.log(folder_id, id);
+            var [resp, err] = await fetch2('?query=file_folder_update&folder_id='+folder_id+'&id='+id);
+            self.lastSourceF = null
+            self.lastTargetF = null
+            self.fire('refresh')
+          }
+          // resetuj obojicu
+        }
+      })
+      this.lastTargetF = null;
+      this.on('DROP', function(e) {
+        //console.log('tagret: ' + e.type)
+        if ((e.type == 'enter') || (e.type == 'over'))
+          self.lastTargetF = e.node;
+        if (e.type == 'leave') setTimeout(function(){self.lastTargetF = null;},1000)
+        //console.log('DROP',event)
+      })
+
+      this.on('showFullScreen', function(o){
+          self.set('showFullScreenObj', o);
+          self.set('showFullScreen', true);
+          //{{HOSTNAME}}image.php?id={{id}}
+      })
+      //this.focusFirstElement();
+      this.handleDragenter = function (e) {
+          //console.log('Dragenter')
+          self.set('drag', true)
+      }
+      this.handleDragleave = function (e) {
+          self.set('drag', false)
+      }
+
+      this.handleDrop = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          let dt = e.dataTransfer;
+          let files = dt.files;
+          self.fire('upload', files);
+          self.set('drag', false)
+          return false;
+      }
+      this.handleDragover = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          self.set('drag', true)
+          return false;
+      }
+
+      this.nodes.dropArea.addEventListener('drop', this.handleDrop, false);
+      this.nodes.dropArea.addEventListener('dragover', this.handleDragover, false);
+      this.nodes.dropArea.addEventListener('dragleave', this.handleDragleave, false);
+      this.nodes.dropArea.addEventListener('dragenter', this.handleDragenter, false);
+      
+      this.nodes.inputfile.onchange = function() {
+          self.fire('upload')
+      };        
+      //this.singleUpload = function(file){}
+
+
+      this.on('uploadFromCropper', async function(){
+        cropper.getCroppedCanvas().toBlob(async (blob) => {
+          var data = new FormData()
+          data.append('file', blob, self.get('lastFileName'));
+          data.append('selectedfolder', self.get('selectedfolder'))
+
+          resp = await fetch(HOSTNAME+'uploadfile.php', {
+              method: 'POST',
+              credentials:'same-origin',
+              //'Content-Type': 'application/json',
+              body: data
+          })
+          //.then(function(resp){
+              //console.log('up resp',resp)
+          izitoast.success({ message: 'File uploaded.'});
+              //self.fire('refresh')
+              
+          if (resp) resp.text().then(function(id){
+              //console.log('iidd uploada',id)
+              self.set('imgSelect', id)
+              self.set('showCropperModal', false)
+
+              self.set('path', id)
+              //console.log('imgSelect',r)
+              if (self.parent) self.parent.fire('path', id);
+              self.set('show', false)          
+            })
+          //self.fire('refresh')
+        }, 'image/jpeg', 0.75)
+      })
+
+      this.on('upload', async function(files){
+          //console.log(e)
+          if (!files){
+//                var input = document.querySelector('input[type="file"]');
+              var input = self.nodes.inputfile;
+              files = input.files;
+              //data.append('file', input.files[0])
+          }
+          var aspect_ratio = self.get('aspect_ratio')
+          if (aspect_ratio){
+            self.set('showCropperModal',true).then(function(){
+              const image = self.nodes.cropperImage;
+              var FR= new FileReader();
+              FR.onload = function(e) {
+                //var img = new Image();
+                //img.addEventListener("load", function() {
+                //  context.drawImage(img, 0, 0);
+                //});
+                image.src = e.target.result;
+                cropper = new window.Cropper(image, {
+                  aspectRatio: aspect_ratio,
+                  viewMode:1, //restrict the crop box to not exceed the size of the canvas.
+                  dragMode:'move',
+                  autoCropArea:1,
+                  /*
+                  crop(event) {
+                    console.log(event.detail.x);
+                    console.log(event.detail.y);
+                    console.log(event.detail.width);
+                    console.log(event.detail.height);
+                    console.log(event.detail.rotate);
+                    console.log(event.detail.scaleX);
+                    console.log(event.detail.scaleY);
+                  },
+                  */
+                });                     
+              };       
+              FR.readAsDataURL( files[0] );
+              self.set('lastFileName', files[0].name)
+                  
+            })
+            return
+          }
+          izitoast.info({ message: 'Uploading to server, please wait...'});
+          var resp;
+          for (var i=0; i<files.length;i++){
+              var data = new FormData()
+              data.append('file', files[i]);
+              data.append('selectedfolder', self.get('selectedfolder'))
+
+              resp = await fetch(HOSTNAME+'uploadfile.php', {
+                  method: 'POST',
+                  credentials:'same-origin',
+                  //'Content-Type': 'application/json',
+                  body: data
+              })
+              //.then(function(resp){
+                  //console.log('up resp',resp)
+              izitoast.success({ message: 'File '+(i+1)+' of '+ files.length+' uploaded.'});
+                  //self.fire('refresh')
+                  
+          }
+          if (resp) resp.text().then(function(id){
+              //console.log('iidd uploada',id)
+              self.set('imgSelect', id)
+          })
+          self.fire('refresh')
+          //return false; 
+      })
+
+      this.on('refresh TGrid.refresh', async function(){
+          var [folders, err] = await fetch2('?query=_Folders');
+          if (folders) self.set('folders', folders);
+
+          var selectedfolder = self.get('selectedfolder') || '';
+          var [resp, err] = await fetch2('?query=_files&folder_id='+selectedfolder);
+          if (resp) self.set('rows', resp);
+          
+      })
+      this.fire('refresh')
+
+      this.observe('selectedfolder', function(n){
+        self.fire('refresh');
+      }, {init:false})
+
+      this.on('file_folder_update', function(folder_id, id){
+        //console.log(folder_id, id);
+        //var [resp, err] = await fetch2('?query=file_folder_update&folder_id='+folder_id+'&id='+id);
+      })
+
+      this.on('imgSelect', function(r){
+          //console.log('imgSelect',r)
+          self.set('imgSelect', r.slug)
+      })
+
+      this.on('confirm', function(r){
+          self.set('path', self.get('imgSelect'))
+          //console.log('imgSelect',r)
+          if (self.parent) self.parent.fire('path', self.get('imgSelect'));
+          self.set('show', false)
+      })
+      
+      this.on('delete', async function(){
+          ractive.fire('showYesNoDialog', 'Delete file '+self.get('imgSelect') + ' ?', async function(answer){
+              var [resp, err] = await fetch2('?query=_files&_action=delete&id='+self.get('imgSelect') )
+              if (resp ) {
+                  self.set('imgSelect', null);
+                  self.fire('refresh');
+                  izitoast.success({ message: 'File removed'});
+              }
+          })
+      })
+
+  },        
+  data:function() {
+          return {
+              G:null,
+              rows:[],
+              path:null,
+              aspect_ratio:null,
+              imgSelect:null,
+              drag:false,
+              showFullScreen:false,
+              showFullScreenObj:{},
+              show_confirm_btn:true,
+              selectedfolder:0,
+              showFoldersModal:false,
+              folders:[],
+              showCropperModal:false,
+              lastFileName:''
+          }
+      }
+  };
+  </script>
+
+

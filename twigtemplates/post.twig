@@ -2,143 +2,37 @@
 
 {% set slug = _GET['1'] %}
 {% set Post = fetch("Post", {id:slug})[0] %}
+{% block title %} - {{Post.Title}}{% endblock %}
 {% block description %}{{Post.Description}}{% endblock %}
+{% block image %}{{_BASE}}img/{{Post.Image}}{% endblock %}
+
 {% block content %}
-	<h5>{{Post.Title}} <tag style="float:right; text-transform: none;">Posted at {{Post.Date}}</tag></h5>
-  {% if Post.Image %} <img src="img/{{Post.Image}}"> {% endif %}
-  <div style="margin-top: 1rem;" >{{Post.Body | raw}} </div> 
 
-  {% set Comment = fetch("CommentByPostId", {PostId:Post.id}) %}
-  <h2>Comment</h2>
-  <table border=1 style="width:100%" id="commentsTable">
-  <tr>
-<!--    <td>id</td> -->
-    <td>Img</td>
-    <td>PostId</td>
-    <td>Text</td>
-    <td>Author</td>
-<!--    <td>ParentCommentId</td>
-    <td>ParentCommentId</td> -->
-  </tr>
-  {% for item in Comment %}
-  <tr>
-<!--    <td> {{item.id}} </td> -->
-    <td> <img src="{{item.google_user_picture}}"> </td>
-    <td> {{item.PostId_label}} </td>
-    <td> {{item.Text}} </td>
-    <td> {{item.google_user_given_name}} </td>
-<!--    <td> {{item.ParentCommentId}} </td>
-    <td> {{item.ParentCommentId_label}} </td> -->
-  </tr>
-  {% endfor %}
-  </table>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
 
+      <div class="card post border-0" style="width: 100%;">
+        {% if Post.Image %} 
+        <img class="card-img-top" src="img/{{Post.Image}}" alt="{{Post.Title}}">
+         {% endif %}
+        <div class="card-body">
+          <span class="badge badge-primary float-right">Posted at {{Post.Date}}</span>
+          <h2 class="card-title">{{Post.Title}}</h2>
+          <div class="card-text">{{Post.Body | raw}}</div>
+        </div>
+      </div>
 
-
-  <card>
-    <h2>Post a Comment</h2>
-    <textarea id="textComment" placeholder="Sign in to comment"></textarea>
-    <div style="display:flex; justify-content: space-between;">
-      <div id="my-signin2" style="display: inline-block;"></div>
-      <button id="publishComment" disabled style="margin:0" onclick="postComment()">Publish</button>
     </div>
-  </card>
+  </div>
+</div>
 
-  
-  <script>
-    // Google auth
-    var GoogleUserData = {}
-    function onSuccess(googleUser) {
-      //console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
-      //console.log('Logged in detils: ' + JSON.stringify(googleUser.getBasicProfile()));
-      document.getElementById("textComment").placeholder = "Enter your comment..."
-      document.getElementById("publishComment").disabled = false
-      
-      var id_token = googleUser.getAuthResponse().id_token;
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'cms/googletokensignin.php');
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-      xhr.onload = function() {
-        console.log('Signed in as: ' + xhr.responseText);
-        try{
-          GoogleUserData =  JSON.parse(xhr.responseText)
-        }
-        catch(e){
-          console.log('Bad verification response', e)
-        }
-      };
-      xhr.send('idtoken=' + id_token);      
+{% include 'comments.twig' %}
+{% endblock %}
 
-    }
-    function onFailure(error) {
-      console.log(error);
-    }
-    function renderButton() {
-      gapi.signin2.render('my-signin2', {
-        'scope': 'profile email',
-        'width': 240,
-        'height': 50,
-        'longtitle': true,
-        'theme': 'dark',
-        'onsuccess': onSuccess,
-        'onfailure': onFailure
-      });
-    }
-
-
-  function postComment(){
-    console.log('comm')
-    var data = {};
-    data.textComment = document.getElementById("textComment").value
-    data.PostId = '{{Post.id}}'
-    document.getElementById("textComment").value = '';
-
-    var fd = new FormData();
-    //very simply, doesn't handle complex objects
-    for(var i in data){
-      fd.append(i,data[i]);
-    }
-{% verbatim %}
-
-    var xhr = new XMLHttpRequest();
-    xhr.responseType = 'json';
-    xhr.open('POST', 'cms/postComment.php', true);
-    //xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onload = function(resp) {
-//      console.log(resp)
-      var newPostHtmlContent= t(`  
-  <tr>
-    <td> {{id}} </td>
-    <td> {{PostId}} </td>
-    <td> {{PostId_label}} </td>
-    <td> {{Text}} </td>
-    <td> {{Author}} </td>
-    <td> {{ParentCommentId}} </td>
-    <td> {{ParentCommentId_label}} </td>
-  </tr>`, xhr.response)
-      console.log(xhr.response, newPostHtmlContent)
-
-      var myHtmlContent = "<h3>hello</h3>"
-      var tableRef = document.getElementById('commentsTable').getElementsByTagName('tbody')[0];
-
-      var newRow = tableRef.insertRow(tableRef.rows.length);
-      newRow.innerHTML = newPostHtmlContent;
-
-    };
-    xhr.send(fd);   
-  }
-
-
-  function t(s,d){
-  for(var p in d)
-    s=s.replace(new RegExp('{{'+p+'}}','g'), d[p]);
-  return s;
-  }
-{% endverbatim %}  
-
-  </script>
-
-  <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
-
-
+{% block last %}
+<script>
+$('.post blockquote').addClass('blockquote')
+$('.post blockquote > footer').addClass("blockquote-footer")
+</script>
 {% endblock %}

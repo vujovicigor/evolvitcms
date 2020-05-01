@@ -2,57 +2,67 @@
 <html lang="en" style="height: 100%">
 <head>
   <base href="{{_BASE}}">
-  <title>Example</title>
+  {% set SiteSettings = fetch("SiteSettings") %}
+  <title>{{SiteSettings.SiteName}} {% block title %}{% endblock %}</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{% block description %}{% endblock %}"/>
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bare-css@2.0.3/css/bare.min.css">
+
+  <meta property="og:title" content="{{SiteSettings.SiteName}} {{ block('title') }}">
+  <meta property="og:description" content="{{ block('description') }}">
+  <meta property="og:image" content="{% block image %}{% endblock %}">
+  {#
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">  
+  #}
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/{{SiteSettings.Theme_label | lower}}/bootstrap.min.css">  
+  
+  
+
   <link rel="stylesheet" type="text/css" href="cms/sharedstyle.css">
   <meta name="google-signin-client_id" content="785648520554-sqghvcrl2gprpa3a02bkfkinp8s398mv.apps.googleusercontent.com">
-
   <!--
   <meta name="keywords" content="">
   <link rel="icon" href="images/favicon.png">
   -->
 </head>
-<body style="display: flex; flex-flow: column; height: 100%">
-  <nav>
-    <label>
-      <input type="checkbox">
-      <header>
-        <!-- you can leave this empty if you don't want a title -->
-        <a><!--<img src="img/bareCSS.svg">-->Evolvit CMS</a>
-      </header>
-      
-      <ul>
-        <li><a href="index">Home</a></li>
-        <li>
-          <a>Posts</a>
-          <menu>
-          {% for item in fetch("Post") if item.Publish == 'true' %}
-            <menuitem><a href="post/{{item.Slug}}">{{item.Title}}</a></menuitem>
-          {% endfor %}
-          </menu>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <a class="navbar-brand" href="index">{{SiteSettings.SiteName}}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto">
+        {% for item in fetch("Post") if item.Publish == 'true' %}
+          <li class="nav-item {{_GET[1]==item.Slug?'active':''}}">
+            <a class="nav-link text-uppercase" href="post/{{item.Slug}}"> {{item.Title}} </a>
+          </li>
+        {% endfor %}          
+
+{#
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Posts
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            {% for item in fetch("Post") if item.Publish == 'true' %}
+              <a class="dropdown-item" href="post/{{item.Slug}}">{{item.Title}}</a>
+            {% endfor %}          
+          </div>
         </li>
+        #}
+
       </ul>
-    </label>
+    </div>
   </nav>
 
-<section style="flex:1; overflow:auto;">
   {% block content %}{% endblock %}
-</section>
-
-  <footer>
-    <grid>		
-      <div col="1/1" style="text-align: center">
-        <p>
-          <a att href="https://github.com/vujovicigor/evolvitcms" target="_blank">
-            github.com/vujovicigor/evolvitcms
-          </a>
-        </p>
-      </div>
-    </grid>
-  </footer>
 
 </body>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+{% block last %}{% endblock %}
 </html>

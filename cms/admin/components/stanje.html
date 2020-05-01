@@ -1,0 +1,75 @@
+
+<section style="flex:1; padding-bottom:0.5rem; padding-top:0.5rem; overflow:auto">
+    <div style="display:box; display:flex; height:100%; overflow:auto; flex:1">
+        <f2table style="width:100%" rows={{rows}} row={{row}} visible="true" close={{closeList}} headerFixedHeight={{headerFixedHeight}} alternateColor="{{alternateColor}}" 
+            serviceName="{{serviceName}}" columns={{columns}}  env={{env}} ipp="100"
+            variableRowHeight={{variableRowHeight}} showSearch={{showSearch}} showPaginator={{showPaginator}} showHeaders={{showHeaders}} selectid={{selectid}} loading={{stanjeIsLoading}} nodata={{nodata}} >
+        </f2table>
+    </div>
+</section>
+<section style="padding-bottom:0.5rem; padding-top:0.5rem">
+    <button primary m-full on-click="@this.getStanje()" style="width: 100%;" >Last sync: {{stanjeDate}}
+        <i style="float:right" class="glyphicon {{stanjeIsLoading?'glyphicon-repeat fast-right-spinner':'glyphicon-refresh'}} "></i>
+    </button>
+</section>
+
+<script>
+  component.exports = {
+    onrender: function () {
+        var self = this;
+        const got = require('got');
+        this.formatDate = function(date){
+            return  date.getDate() + '.' + (date.getMonth()+1) + '.' + date.getFullYear() + ' ' + date.getHours()+':' + date.getMinutes()
+        }
+        setTimeout(function(){
+            var stanjeDate = localStorage.getItem("stanjeDate");
+            if (stanjeDate) {
+                var date = new Date(parseInt(stanjeDate));
+                self.set('stanjeDate', self.formatDate(date));
+                self.set('rows', cacheLocalStorage.stanje?cacheLocalStorage.stanje:JSON.parse(localStorage.getItem("stanje")));
+            }
+        },1)
+        this.getStanje = async function() {
+            self.set('stanjeIsLoading', true);
+            setTimeout(function(){ self.set('stanjeIsLoading', false) }, 1000)
+            try {
+                const response = await got('http://77.105.33.22:8765/stanje', { json: true });
+//                console.log(response.body);
+                localStorage.setItem("stanje", JSON.stringify(response.body));
+                var date= new Date();
+                var dateInt = date.getTime();
+                localStorage.setItem("stanjeDate", dateInt);
+                
+                var dateF = self.formatDate(date);
+                
+                self.set('stanjeDate', dateF);
+                self.set('stanjeIsLoading', false);
+                self.set('rows', response.body);
+            } catch (error) {
+                //console.log(error);
+                self.set('stanjeIsLoading', false);
+            }
+        }    
+        this.getStanje()
+    },        
+    data:function() {
+            return {
+                text: ''
+                , ur:null
+                , rows:[]
+                , row:null
+                , stanjeDate: ''
+                , stanjeIsLoading:false
+                , columns: [
+        //        {visible:true , filter:false, compId:"id", compType:"text", label:"Naziv", w:"20%", template:"<img style='height:2em' src='objengine/image.php?filename={{viewport[i][.compId]}}&h=140'>"}
+                   // {visible:true , filter:true, compId:"id", compType:"text", label:"Naziv", w:"100%",
+                  //  template:"<div> {{viewport[i]['id']}}</div>" },Number(77).toFixed(2)
+                  {visible:true , filter:true, compId:"id", compType:"text", label:"Naziv", w:"100%"},
+                  {visible:true , filter:true, compId:"wh", compType:"text", label:"Magacin", w:"9em"},
+                  {visible:true , filter:true, compId:"kol", compType:"number", label:"Kol", w:"12em", template:"{{Number(viewport[i][compId]).toFixed(2)}}"},
+                ]
+                            
+            }
+        }
+  };
+  </script>

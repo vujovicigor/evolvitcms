@@ -1,14 +1,10 @@
 <?php
 $idtoken = $_POST['idtoken'];
-//echo $idtoken;
 
-// Get cURL resource
 $curl = curl_init();
-// Set some options - we are passing in a useragent too here
 curl_setopt_array($curl, [
     CURLOPT_RETURNTRANSFER => 1,
     CURLOPT_URL => 'https://oauth2.googleapis.com/tokeninfo?id_token='.$idtoken,
-    //CURLOPT_USERAGENT => 'Codular Sample cURL Request'
 ]);
 // Send the request & save response to $resp
 $resp = curl_exec($curl);

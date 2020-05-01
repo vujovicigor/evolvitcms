@@ -1,0 +1,334 @@
+<section xx style="padding-bottom:0; padding-top:2rem; display:flex; flex-flow: column; flex:1; overflow: auto;">
+    <div style="display:flex;">
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Info'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Info')" >Info</button>
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Fields'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Fields')" >Fields</button>
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='PHP'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','PHP')" >PHP Template</button>
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='TWIG'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','TWIG')" >TWIG Template</button>
+        <button style="margin-left: auto;" on-click="@this.set('showSchemaFiledAdd',true)" >Add new field</button>
+<!--
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='List View'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','List View')" >List View</button>
+        <button class="tabz" xx style="border-bottom-color:{{selectedTab=='Detail View'?'var(--primary)':'#fff'}}" default type="button" on-click="@this.set('selectedTab','Detail View')" >Detail View</button>
+-->
+    </div>
+    <!-- PHP Templates -->
+    {{#if selectedTab=='PHP'}}
+    <div style="flex:1; overflow: auto;">
+        <pre><code>{{php}}</code></pre>
+    </div>
+    {{/if}}
+
+    <!-- TWIG Templates -->
+    {{#if selectedTab=='TWIG'}}
+    <div style="flex:1; overflow: auto;">
+        <pre><code>{{twig}}</code></pre>
+    </div>
+    {{/if}}
+
+    <!-- Info -->
+    {{#if selectedTab=='Info'}}
+    <div style="flex:1; overflow-x: hidden; overflow-y: auto;">
+        <grid style="flex:1; overflow:auto;">
+            <div col='1/1'>
+                <label style="width: 14rem;">Schema name</label>
+                <input type="text" readonly value={{row.name}} style="width: calc(100% - 15rem);">
+            </div>
+            
+            <div col='1/1'>
+                <label style="width: 14rem;">Nice name</label>
+                <input type="text" placeholder="nice name" value={{row.nice_name}} style="width: calc(100% - 15rem);">
+            </div>
+            
+            <div col='1/1'  style="display: flex; align-items: center;" >
+              <label style="width: 14rem;">Visible in menu</label>
+              <Selectize url="?query=_role" value="{{row.menu_visible_role_array}}" labelf="name" 
+                  multiple="multiple" style="display: inline-block; width: calc(100% - 15rem)"  > 
+              </Selectize>
+            </div>
+            
+            <!--
+            <div col='1/1'>
+                <input type="checkbox" id="checkbox-1" checked={{row.is_multiple}}> 
+                <label for="checkbox-1">Multiple rows</label>
+            </div>-->
+            <div col='1/1'>
+                <label style="width: 14rem;">Sort by</label>
+                <select style="width:calc(99% - 19em); display: inline;" value='{{row.sort_field}}'>
+                    <option value=''>Pick field</option>
+                    {{#each row.field:key}}
+                        <option value='{{.field_name}}'>{{.field_name}} ({{.nice_name}})</option>
+                    {{/each}}
+                </select>     
+                <Checkbox id="groupcheckbox-55" checked={{row.sort_asc}}></Checkbox>
+                <label for="groupcheckbox-55">Ascending</label> 
+            </div>
+
+            <div col='1/1'>    
+                <label style="width: 14rem;">Sort collation</label>
+                <select style="width:calc(99% - 19em); display: inline;" value='{{row.sort_collate}}'>
+                    <option value=''>Pick Collation</option>
+                    {{#each collation}}
+                        <option value='{{.}}'>{{.}}</option>
+                    {{/each}}
+                </select>             
+            </div>
+
+            <div col='1/1'>    
+                <label style="width: 14rem;">Menu order</label>
+                <input type="number" placeholder="" value={{row.menu_sort}} style="width: 10rem">
+            </div>
+            <div col='1/1'>
+                <Checkbox id="checkbox-2" checked={{row.is_multiple}}></Checkbox>
+                <label for="checkbox-2">Multiple rows</label>
+            </div>
+            {{#if row.is_multiple===true || row.is_multiple=='true' }}
+            <div col='1/1'>
+                <label style="width: 14rem;">Group table By  </label>
+                <select style="width:calc(99% - 19em); display: inline;" value='{{row.group_by}}'>
+                    <option value=''>(don't group)</option>
+                    {{#each row.field:key}}
+                        <option value='{{.field_name}}'>{{.field_name}} ({{.nice_name}})</option>
+                    {{/each}}
+                </select>     
+                <Checkbox id="groupcheckbox-2" checked={{row.group_by_order_asc}}></Checkbox>
+                <label for="groupcheckbox-2">Ascending</label>
+            </div>
+            {{/if}}
+                                    
+        </grid> 
+        <button on-click="droptable">Drop table {{schema_name}}
+        </button>            
+        <button primary style="float:right" on-click="schema_update">Save
+        </button>            
+                    
+    </div>
+    {{/if}}
+
+    <!-- Fields -->
+    {{#if selectedTab=='Fields'}}
+    <div style="flex:1; overflow: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Field name</th>
+                    <th>Nice name</th>
+                    <th>Type</th>
+<!--
+                    <th>Placeholder</th>
+                    <th>Tooltip</th>
+-->                    
+                    <th>Sort</th>
+<!--                    
+                    <th>Default value</th>
+                    <th>Lookup table</th>
+                    <th>Lookup field</th>
+-->                    
+                    <th>Show on grid</th>
+                    <th>Show on details</th>
+<!--
+                    <th>Searchable</th>
+                    <th>Width</th>
+-->                    
+                </tr>
+            </thead>
+            <tbody>
+                {{#each row.field}}
+                <tr style="cursor: pointer" on-click="@this.fire('selectRow', .)">
+                    <td>{{.field_name}}</td>
+                    <td>{{.nice_name}}</td>
+                    <td>{{.field_type}}</td>
+<!--
+                    <td>{{.placeholder}}</td>
+                    <td>{{.tooltip}}</td>
+-->                    
+                    <td>{{.field_sort}}</td>
+<!--                    
+                    <td>{{.default_value}}</td>
+                    <td>{{.lookup_table}}</td>
+                    <td>{{.lookup_field}}</td>
+-->                    
+                    <td>
+                        {{#if .visible === 'true' }}
+                            <i class="glyphicon glyphicon-ok green"></i>
+                        {{/if}}
+                        {{#if .visible === 'false' }}
+                            <i class="glyphicon glyphicon-remove red"></i>
+                        {{/if}}
+                    </td>
+                    <td>
+                        {{#if .visible_details === 'true' }}
+                            <i class="glyphicon glyphicon-ok green"></i>
+                        {{/if}}
+                        {{#if .visible_details === 'false' }}
+                            <i class="glyphicon glyphicon-remove red"></i>
+                        {{/if}}
+                    </td>
+<!--                    
+                    <td>
+                        {{#if .filter === 'true' }}
+                            <i class="glyphicon glyphicon-ok green"></i>
+                        {{/if}}
+                        {{#if .filter === 'false' }}
+                            <i class="glyphicon glyphicon-remove red"></i>
+                        {{/if}}
+                    </td>
+                    <td>{{.w}}</td>
+-->                    
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>        
+    </div>
+<!--
+    <div id="testbtn" style="display:box; display:flex; height:100%; overflow:auto; flex:1">
+        <f2table style="width:100%" rows={{row.field}} visible="{{true}}" headerFixedHeight={{false}} alternateColor="{{true}}" 
+            columns={{columns}} ipp="50" refresh={{refresh}} fr={{fr}} 
+            variableRowHeight={{false}} showSearch={{true}} showPaginator={{true}} showHeaders={{true}} nodata={{false}} >
+        </f2table>
+    </div>
+-->
+    {{/if}}
+    
+</section>   
+
+{{#if showSchemaFiledAdd }}
+<modal show="{{showSchemaFiledAdd}}" title="Create New Field in {{row.name}}" 
+class="animated fadeInRight" showOverlay="{{true}}" showHeader="{{true}}" style="
+height: calc(100vh - 6rem);
+width: 46em;
+left: calc(50% - 23em);
+right: inherit;
+top: 6rem;
+bottom: inherit;
+" >
+    <SchemaFiledAdd G={{.}} table_name={{row.name}} update={{false}} show="{{showSchemaFiledAdd}}"></SchemaFiledAdd>
+</modal>
+{{/if}}
+
+
+{{#if showSchemaFiledUpdate }}
+<modal show="{{showSchemaFiledUpdate}}" title="Update Field in {{row.name}}" 
+class="animated fadeInRight" showOverlay="{{true}}" showHeader="{{true}}" style="
+height: calc(100vh - 6rem);
+width: 46em;
+left: calc(50% - 23em);
+right: inherit;
+top: 6rem;
+bottom: inherit;
+" >
+    <SchemaFiledAdd G={{.}} table_name={{row.name}} row={{selected_row}} update={{true}} show="{{showSchemaFiledUpdate}}"></SchemaFiledAdd>
+</modal>
+{{/if}}
+
+
+<style>
+.green{ color:green}
+.red{ color:red}
+.tabz{
+    transition: border-color 0.5s;
+    border-radius:0;
+    border:0;
+    border-bottom: solid 1px #fff;
+}    
+
+.tabz:hover{
+    box-shadow: none !important;
+    background:0 !important;
+    border-bottom-color:var(--primary) !important;
+}
+</style>
+<script>
+    component.exports = {
+        onrender: function (options) {
+            var self = this;
+            window.Schema = self;
+            //engine_schema_get
+            this.on('refresh', async function(){
+                var tablename = self.get('schema_name');
+                var [resp, err] = await fetch2('?query=_engine_schema&tablename=' + tablename)
+                if (resp && resp.length==1) {
+                  self.set('row', resp[0]);
+
+                  // int to array of bits
+                  var menu_visible_role_array = []
+                  var menu_visible_role = Number( resp[0].menu_visible_role )
+                  var bit_pos = 0
+                  while ( menu_visible_role > 0 )  {
+                    if ( (menu_visible_role&1)==1 ) menu_visible_role_array.push(Math.pow(2,bit_pos))
+                    menu_visible_role = menu_visible_role>>>1
+                    bit_pos++
+                  }                  
+                  self.set('row.menu_visible_role_array', menu_visible_role_array );
+
+                }
+                    
+                var [t, err] = await fetch2('?query=_generate_template&tablename=' + tablename)
+                //console.log('t',t);                        
+                self.set('php', t.php);
+                self.set('twig', t.twig);
+            })
+            this.fire('refresh');
+
+            this.on('selectRow', function(r){
+                //console.log('r::',r)
+                self.set('selected_row',r); 
+                self.set('showSchemaFiledUpdate', true);                
+            })
+
+            this.on('schema_update', async function(){
+                var o =  self.get('row');
+                o.menu_visible_role = 0;
+                for (var i=0; i<o.menu_visible_role_array.length; i++) {
+                  o.menu_visible_role = o.menu_visible_role + Number( o.menu_visible_role_array[i] )
+                }
+                o.tablename = self.get('schema_name')
+
+                //var [resp, err] = await fetch2('?query=engine_schema_update', o)
+                var [resp, err] = await fetch2('?query=_engine_schema&_action=update', o)
+                self.fire('refresh');
+                if (self.parent) self.parent.fire('refresh');
+                izitoast.info({ message: 'Changes saved'});
+
+            })
+
+            this.on('droptable', async function(){
+                ractive.fire('showYesNoDialog', 'Delete schema '+self.get('schema_name')+' ?', async function(answer){
+
+                    var tablename = self.get('schema_name');
+                    var [resp, err] = await fetch2('?query=_engine_schema&_action=delete&tablename=' + tablename)
+                    if (resp) {
+                        if (self.parent) self.parent.fire('refresh');
+                        self.set('G.selected_tablename', null);
+                        self.set('G.selectedModule', 'Schema')
+                        izitoast.info({ message: 'Table '+tablename+' deleted.'});
+                        self.set('show', false);
+                    }
+                })
+            })
+            
+        },
+        data: function () {
+            return {
+                selectedTab:'Fields'
+                , schema_name:''
+                , row:{
+                    schema_name:''
+                    , field:[]
+                    , group_by:''
+                    , group_by_order_asc:'true'
+                    , menu_sort:''
+                    , sort_field:''
+                    , sort_desc:'false'
+                    , sort_collate:''
+                }
+                , collation:['SR_LATIN_CMP','NATURAL_CMP', 'NOCASE', 'BINARY','RTRIM']
+                , columns:null
+                , showSchemaFiledAdd:false
+                , showSchemaFiledUpdate:false
+                , selected_row:{}
+                , G:{}
+                , php:''
+                , twig: ''
+            }
+        }
+    }
+</script>

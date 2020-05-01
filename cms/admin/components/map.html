@@ -1,0 +1,75 @@
+<section xx class="componentSection">
+    <div style="margin-left:1rem">
+        <input style="width: 30rem; margin-right: 2rem;" placeholder="gps coordinates" value="{{gps}}">
+        <button style="float: right;" on-click="@this.fire('confirm')" primary>Confirm</button>
+    </div>
+    <div id="mapid"></div>            
+</section>
+
+<style>
+#mapid { 
+    height: 40rem;
+    flex: 1;
+    margin: 1rem
+}
+.componentSection {
+    flex:1; 
+    padding-bottom:0; 
+    padding:1rem; 
+    overflow:auto; 
+    display:flex; 
+    flex-flow:column; 
+    height:100%;
+    max-width: unset;
+}
+</style>
+<script>
+    component.exports = {
+    onrender: function () {
+        var self = this;
+        //console.log('MAP render'); //why 2x?
+        if (self.again){ return}
+        self.again = true;
+        var lat = 44.82766073430623;
+        var lng = 20.435552000999454;
+        var gps = self.get('gps');
+        if (gps){
+            lat = isNaN(gps.split(',')[0])?lat:gps.split(',')[0];
+            lng = isNaN(gps.split(',')[1])?lng:gps.split(',')[1];
+        }
+        self.set('tmpgps', lat+','+lng );
+        //var map = L.map('mapid').setView([51.505, -0.09], 13);
+        var map =  L.map('mapid').setView([lat, lng ], 13);
+        MAP = map; // global
+
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);    
+
+        var marker = new L.marker([lat, lng]).addTo(map);
+
+        map.on('click', function(e) {
+            self.set('tmpgps', e.latlng.lat+','+e.latlng.lng );
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            //marker = new L.Marker(e.latlng).addTo(map);            
+            marker = new L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+            //self.set('lng', e.latlng.lng);
+            //alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng)
+        });      
+
+        this.on('confirm', function(){
+            self.set('gps', self.get('tmpgps'));
+            self.set('show', false)
+        })
+    },        
+    data:function() {
+        return {
+            G:{}
+            , gps:null
+            , tmpgps:null
+        }
+    }
+};
+</script>
