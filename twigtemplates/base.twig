@@ -16,7 +16,6 @@
   #}
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/{{SiteSettings.Theme_label | lower}}/bootstrap.min.css">  
   
-  
 
   <link rel="stylesheet" type="text/css" href="cms/sharedstyle.css">
   <meta name="google-signin-client_id" content="785648520554-sqghvcrl2gprpa3a02bkfkinp8s398mv.apps.googleusercontent.com">
@@ -46,7 +45,7 @@
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Posts
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="max-height: calc(100vh - 6rem);overflow: auto; max-width: calc(100vw - 5rem)">
             {% for item in fetch("Post") if item.Publish == 'true' %}
               <a class="dropdown-item" href="post/{{item.Slug}}">{{item.Title}}</a>
             {% endfor %}          
