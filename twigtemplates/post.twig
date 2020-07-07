@@ -14,7 +14,13 @@
 
       <div class="card post border-0" style="width: 100%;">
         {% if Post.Image %} 
-        <img class="card-img-top" src="img/{{Post.Image}}" alt="{{Post.Title}}">
+        <img class="card-img-top" 
+          srcset="imgcache/600/{{Post.Image}} 480w,
+             imgcache/{{Post.Image}} 800w"
+          sizes="(max-width: 600px) 480px,
+            800px"
+          src="imgcache/{{Post.Image}}" 
+          alt="{{Post.Title}}">
          {% endif %}
         <div class="card-body">
           <span class="badge badge-primary float-right">Posted at {{Post.Date}}</span>

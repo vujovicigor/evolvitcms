@@ -201,9 +201,29 @@
         $data = $db->query('select name as id, template from Twig')->fetchAll(PDO::FETCH_KEY_PAIR);
         return $data;
     }
-    
+
+    function get_image_blob($id){
+      global $db;
+      $stmt = $db->prepare("SELECT image_blob, mime_type from _files where id = :id 
+      union all SELECT image_blob, mime_type from _files where (nice_url ||  case when ver=0 then '' else '_'||ver end  || '.' ||  extension) = :id limit 1");
+      $stmt->execute(array('id' => $id));
+      $file = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      if (count($file)<1) { 
+        return false;
+          //echo 'no image';
+         // header("Content-type: image/png");
+         // return array(
+         //   'blob' => file_get_contents(dirname(__FILE__).'/images/noimage.png'),
+         //   'mime_type' => 'image/png'
+         // );            
+          //http_response_code(404); 
+          //return;
+      }    
+      return array('blob' => $file[0]['image_blob'], 'mime_type' => $file[0]['mime_type']);
+    }    
+
     function print_image($id){
-        // redirect if param is absolute url
+      // redirect if param is absolute url
         $v1 = strpos($_SERVER['REQUEST_URI'], 'http://'); 
         $v2 = strpos($_SERVER['REQUEST_URI'], 'https://'); 
         if ( $v1!==false || $v2!==false ) {

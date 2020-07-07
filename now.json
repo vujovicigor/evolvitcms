@@ -1,0 +1,14 @@
+{
+  "functions": {
+    "api/api.php": {
+      "runtime": "now-php@0.0.9"
+    },
+    "api/twig.php": {
+      "runtime": "now-php@0.0.9"
+    }
+  }
+  ,"routes": [
+    { "handle": "filesystem" },
+    { "src": "/([^/]+)", "dest": "/cms/twig.php" }
+  ]
+}
