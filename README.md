@@ -15,6 +15,10 @@ Lightweight PHP + SQLite CMS (Twig templates, Ractive admin in `cms/admin/`).
 
 If you see "Composer detected issues in your platform", switch the site to PHP 8.1 or newer in your hosting panel.
 
+## Templates
+Pages are Twig 3 templates in `twigtemplates/` (`about.twig` → `/about`), content comes from `fetch("Table")`.
+Step-by-step guide: https://evolvitcms.com/doc/twig-templates
+
 ## Requirements
 * PHP >= 8.1 (tested on 8.5) with `pdo_sqlite`, `gd`, `fileinfo`, `curl`, `intl` (optional)
 * Apache with `mod_rewrite` (`AllowOverride All`) – the `.htaccess` files are part of the security model
@@ -40,3 +44,8 @@ client id(s) accepted for comments, or tune login throttling.
 * SQL can not ATTACH/DETACH databases, VACUUM INTO or run writable PRAGMAs (SQLite authorizer).
 * Schema editing is system-administrator only; users can not grant roles above their own.
 * API writes require POST from the same origin; session cookies are HttpOnly/SameSite=Strict (+Secure on HTTPS).
+
+## Releasing
+`git archive --format=zip -o evolvitcms-vX.Y.Z.zip HEAD` (dev-only files are excluded via `.gitattributes`), then attach the
+zip to the GitHub release **twice**: as `evolvitcms-vX.Y.Z.zip` and as `evolvitcms.zip`. The second, version-less name
+keeps `https://github.com/vujovicigor/evolvitcms/releases/latest/download/evolvitcms.zip` pointing at the newest release.
