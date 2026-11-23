@@ -9,6 +9,8 @@ if (defined('EVOLVIT_SECURITY_LOADED')) return;
 define('EVOLVIT_SECURITY_LOADED', true);
 
 if (file_exists(__DIR__ . '/config.php')) include_once __DIR__ . '/config.php';
+// installation defaults shipped with a project (config.php overrides them)
+if (file_exists(__DIR__ . '/config.dist.php')) include_once __DIR__ . '/config.dist.php';
 
 if (!defined('EVOLVIT_DEBUG')) define('EVOLVIT_DEBUG', getenv('EVOLVIT_DEBUG') === '1');
 // Google OAuth client ids accepted for comment sign-in. When empty, ids declared in
@@ -16,6 +18,10 @@ if (!defined('EVOLVIT_DEBUG')) define('EVOLVIT_DEBUG', getenv('EVOLVIT_DEBUG') =
 if (!defined('EVOLVIT_GOOGLE_CLIENT_IDS')) define('EVOLVIT_GOOGLE_CLIENT_IDS', '');
 if (!defined('EVOLVIT_LOGIN_MAX_ATTEMPTS')) define('EVOLVIT_LOGIN_MAX_ATTEMPTS', 10);
 if (!defined('EVOLVIT_LOGIN_WINDOW_SECONDS')) define('EVOLVIT_LOGIN_WINDOW_SECONDS', 600);
+// Render templates inside the Twig sandbox (required when untrusted users can edit templates).
+if (!defined('EVOLVIT_TWIG_SANDBOX')) define('EVOLVIT_TWIG_SANDBOX', false);
+// Load templates from the `Twigs` stored query (name/html) instead of the twigtemplates directory.
+if (!defined('EVOLVIT_TWIG_FROM_DB')) define('EVOLVIT_TWIG_FROM_DB', false);
 
 // Never leak stack traces / SQL / paths to visitors unless explicitly debugging.
 error_reporting(E_ALL);
@@ -34,6 +40,8 @@ function evolvit_session_start() {
     if (session_status() === PHP_SESSION_ACTIVE) return;
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
+    // __Host- cookies can not be overwritten from sibling subdomains (cookie tossing)
+    if (evolvit_is_https()) session_name('__Host-evolvitsess');
     session_set_cookie_params(array(
         'lifetime' => 0,
         'path'     => '/',
@@ -143,4 +151,37 @@ function evolvit_json_error($msg, $code = 400) {
     header('Content-Type: application/json');
     echo json_encode(array('error' => $msg));
     exit;
+}
+
+/**
+ * Verify a Google ID token. Returns the token claims, or null when the token is invalid or
+ * was not issued for one of our client ids (without the audience check any Google token
+ * minted for any other application would be accepted).
+ */
+function evolvit_google_verify_token($idtoken) {
+    $idtoken = (string)$idtoken;
+    if ($idtoken === '' || !preg_match('/^[A-Za-z0-9_\-.]+$/', $idtoken)) return null;
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+        CURLOPT_RETURNTRANSFER => 1,
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_URL => 'https://oauth2.googleapis.com/tokeninfo?id_token='.rawurlencode($idtoken),
+    ));
+    $resp = curl_exec($curl);
+    $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+    $d = json_decode((string)$resp, true);
+    if ($status !== 200 || !is_array($d)) return null;
+    if (!in_array(isset($d['aud']) ? $d['aud'] : '', evolvit_google_client_ids(), true)) return null;
+    if (!in_array(isset($d['iss']) ? $d['iss'] : '', array('accounts.google.com', 'https://accounts.google.com'), true)) return null;
+    if (!isset($d['exp']) || (int)$d['exp'] < time()) return null;
+    if ((isset($d['email_verified']) ? (string)$d['email_verified'] : '') !== 'true') return null;
+    return $d;
+}
+
+/** Store verified Google identity in the session (after regenerating the session id). */
+function evolvit_google_login($claims) {
+    session_regenerate_id(true);
+    foreach (array('sub', 'email', 'picture', 'given_name', 'family_name', 'locale') as $k)
+        $_SESSION['_session_google_user_'.$k] = isset($claims[$k]) ? (string)$claims[$k] : '';
 }

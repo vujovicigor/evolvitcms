@@ -1,6 +1,8 @@
 <?php
     require_once(dirname(__FILE__).'/security.php');
     include_once(dirname(__FILE__).'/slug.php');
+    // optional per-installation hook (e.g. the playground picks a per-visitor sandbox database here)
+    if (file_exists(dirname(__FILE__).'/bootstrap.php')) include_once(dirname(__FILE__).'/bootstrap.php');
 
     if (!isset($EVOLVIT_DB_MAIN))      $EVOLVIT_DB_MAIN      = dirname(__FILE__).'/db/main.sqlite';
     if (!isset($EVOLVIT_DB_USERFILES)) $EVOLVIT_DB_USERFILES = dirname(__FILE__).'/db/userfiles.sqlite';
@@ -622,6 +624,16 @@
         }
         if ($mime === 'text/plain' && $extension === 'svg') $mime = 'image/svg+xml';
         if ($mime === 'image/svg' ) $mime = 'image/svg+xml';
+
+        if (defined('EVOLVIT_UPLOADS_QUOTA_BYTES') && EVOLVIT_UPLOADS_QUOTA_BYTES > 0) {
+            $used = 0;
+            foreach (glob(evolvit_uploads_dir().'/*') ?: array() as $f) $used += (int)@filesize($f);
+            if ($used + (int)$uploaded_file['size'] > EVOLVIT_UPLOADS_QUOTA_BYTES) {
+                http_response_code(413);
+                echo 'Upload quota exceeded';
+                return;
+            }
+        }
 
         $folder = ($selectedfolder === null || $selectedfolder === '' || !is_numeric($selectedfolder)) ? null : (int)$selectedfolder;
 
