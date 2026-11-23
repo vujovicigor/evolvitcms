@@ -19,11 +19,20 @@ function getBaseUrl()
     return $protocol.$hostName.$dir;
 }
 
+/** Twig 2 -> 3: `{% for x in list if cond %}` becomes `{% for x in list|filter(x => cond) %}` */
+function evolvit_twig2_compat($src){
+    return preg_replace_callback('/\{%(-?)\s*for\s+(\w+)(?:\s*,\s*(\w+))?\s+in\s+((?:(?!%\}).)+?)\s+if\s+((?:(?!%\}).)+?)\s*(-?)%\}/s', function ($m) {
+        $args = $m[3] !== '' ? '('.$m[3].', '.$m[2].')' : $m[2];
+        $vars = $m[3] !== '' ? $m[2].', '.$m[3] : $m[2];
+        return '{%'.$m[1].' for '.$vars.' in ('.$m[4].')|filter('.$args.' => '.$m[5].') '.$m[6].'%}';
+    }, $src);
+}
+
 $TwigTemplatesDir = dirname( dirname(__FILE__) ).'/twigtemplates';
 $dbTemplates = null;
 if (EVOLVIT_TWIG_FROM_DB) {
     $dbTemplates = array();
-    foreach (fetch('Twigs') as $t) if (isset($t['name'])) $dbTemplates[$t['name']] = (string)$t['html'];
+    foreach (fetch('Twigs') as $t) if (isset($t['name'])) $dbTemplates[$t['name']] = evolvit_twig2_compat((string)$t['html']);
     $loader = new \Twig\Loader\ArrayLoader($dbTemplates);
 } else {
     $loader = new \Twig\Loader\FilesystemLoader( $TwigTemplatesDir );
@@ -59,8 +68,6 @@ if (EVOLVIT_TWIG_SANDBOX) {
                 'macro', 'set', 'verbatim', 'with', 'guard', 'types');
   $policy = new \Twig\Sandbox\SecurityPolicy($tags, array(), array(), array(), array());
   $twig->addExtension(new \Twig\Extension\SandboxExtension($policy, true));
-  $policy->setAllowedFilters(array_keys($twig->getFilters()));
-  $policy->setAllowedFunctions(array_values(array_diff(array_keys($twig->getFunctions()), array('constant', 'enum', 'enum_cases', 'template_from_string'))));
 }
 
 /* transform /filename/param1/param2/... to ['filename', 'param1', 'param2'] and assign it to $_GET */
@@ -109,6 +116,12 @@ if ( $dbTemplates !== null ? !isset($dbTemplates[$templatename]) : !is_file($Twi
 }
 
 try {
+    if (EVOLVIT_TWIG_SANDBOX) {
+        // allow every registered filter (callables must be arrow functions in sandbox mode) and every
+        // function except those that reach PHP constants/enums or compile templates from strings
+        $policy->setAllowedFilters(array_keys($twig->getFilters()));
+        $policy->setAllowedFunctions(array_values(array_diff(array_keys($twig->getFunctions()), array('constant', 'enum', 'enum_cases', 'template_from_string'))));
+    }
     echo $twig->render($templatename);
 } catch (\Twig\Error\Error $e) {
     error_log('EvolvitCMS twig error: '.$e->getMessage());
