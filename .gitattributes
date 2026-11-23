@@ -1,0 +1,11 @@
+# Files left out of release archives (git archive / GitHub "Source code" downloads).
+# The admin UI ships pre-built (cms/admin/js/bundle.js); its sources are only needed to rebuild it.
+/now.json                                export-ignore
+/.gitattributes                          export-ignore
+/cms/admin/components                    export-ignore
+/cms/admin/user                          export-ignore
+/cms/admin/app.js                        export-ignore
+/cms/admin/package.json                  export-ignore
+/cms/admin/package-lock.json             export-ignore
+/cms/admin/webpack.config.js             export-ignore
+/cms/admin/ractive-decorators-sortable.js export-ignore

@@ -2,6 +2,19 @@
 
 Lightweight PHP + SQLite CMS (Twig templates, Ractive admin in `cms/admin/`).
 
+## Installing on shared hosting (no terminal / Composer needed)
+1. Download `evolvitcms-<version>.zip` from the [Releases page](https://github.com/vujovicigor/evolvitcms/releases).
+   It already contains everything, including Twig (`cms/vendor`) and the built admin UI.
+2. Upload the zip with your host's file manager (cPanel, Plesk, DirectAdmin...) into the folder the site should
+   live in (e.g. `public_html/`, or a subfolder such as `public_html/blog/`) and choose *Extract*.
+   The zip has no wrapper folder: its files go straight into that folder.
+   Make sure hidden files (`.htaccess`) were extracted too.
+3. Open `https://your-domain/cms/admin/` and **immediately** create the administrator account
+   (until an account exists, anybody could create it).
+4. That's it: edit content in the admin, templates live in `twigtemplates/`.
+
+If you see "Composer detected issues in your platform", switch the site to PHP 8.1 or newer in your hosting panel.
+
 ## Requirements
 * PHP >= 8.1 (tested on 8.5) with `pdo_sqlite`, `gd`, `fileinfo`, `curl`, `intl` (optional)
 * Apache with `mod_rewrite` (`AllowOverride All`) – the `.htaccess` files are part of the security model
