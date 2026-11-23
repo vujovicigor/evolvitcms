@@ -17,7 +17,7 @@ RewriteRule ^cms/(composer\.json|config\.php|config\.sample\.php|security\.php|e
 #RewriteCond %{HTTP_HOST} !localhost
 #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-RewriteRule ^$ cms/twig.php?twig_file_name=index [L]
+RewriteRule ^$ cms/twig.php?twig_file_name=index [QSA,L]
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f

@@ -9,9 +9,12 @@
     // uploaded files are stored on disk (not in sqlite); only metadata lives in userfiles._files
     if (!isset($EVOLVIT_UPLOADS_DIR))  $EVOLVIT_UPLOADS_DIR  = defined('EVOLVIT_UPLOADS_DIR') ? EVOLVIT_UPLOADS_DIR : dirname(__FILE__).'/uploads';
 
+    // read-only connections (e.g. playground visitors that have not changed anything yet)
+    if (!isset($EVOLVIT_DB_READONLY)) $EVOLVIT_DB_READONLY = false;
     try{
-        if (class_exists('Pdo\Sqlite')) $db = new Pdo\Sqlite('sqlite:'.$EVOLVIT_DB_MAIN);
-        else                            $db = new PDO('sqlite:'.$EVOLVIT_DB_MAIN);
+        $dbopts = $EVOLVIT_DB_READONLY ? array(PDO::SQLITE_ATTR_OPEN_FLAGS => PDO::SQLITE_OPEN_READONLY) : array();
+        if (class_exists('Pdo\Sqlite')) $db = new Pdo\Sqlite('sqlite:'.$EVOLVIT_DB_MAIN, null, null, $dbopts);
+        else                            $db = new PDO('sqlite:'.$EVOLVIT_DB_MAIN, null, null, $dbopts);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $att = $db->prepare("ATTACH DATABASE :path AS userfiles");
         $att->execute(array('path' => $EVOLVIT_DB_USERFILES));
@@ -86,7 +89,7 @@
             error_log('EvolvitCMS: file migration failed: '.$e->getMessage());
         }
     }
-    evolvit_migrate_files_to_disk();
+    if (!$EVOLVIT_DB_READONLY) evolvit_migrate_files_to_disk();
 
     /*
      * SQLite authorizer: even a fully privileged SQL user must not be able to touch the

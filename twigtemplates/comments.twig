@@ -31,44 +31,20 @@
 </div>
 
 <script>
-  // Google auth
+  // Google sign-in (Google Identity Services, see cms/googlesignin.js)
   var GoogleUserData = {}
-  function onSuccess(googleUser) {
-    //console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
-    //console.log('Logged in detils: ' + JSON.stringify(googleUser.getBasicProfile()));
+  function onGoogleSignIn(user) {
+    GoogleUserData = user
     document.getElementById("textComment").placeholder = "Enter your comment..."
     document.getElementById("publishComment").disabled = false
-    
-    var id_token = googleUser.getAuthResponse().id_token;
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'cms/googletokensignin.php');
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onload = function() {
-      //console.log('Signed in as: ' + xhr.responseText);
-      try{
-        GoogleUserData =  JSON.parse(xhr.responseText)
-      }
-      catch(e){
-        console.log('Bad verification response', e)
-      }
-    };
-    xhr.send('idtoken=' + id_token);      
-
   }
-  function onFailure(error) {
-    console.log(error);
+  function onGoogleSignOut() {
+    document.getElementById("textComment").placeholder = "Sign in to comment"
+    document.getElementById("publishComment").disabled = true
   }
-  function renderButton() {
-    gapi.signin2.render('my-signin2', {
-      'scope': 'profile email',
-      'width': 240,
-      'height': 50,
-      'longtitle': true,
-      'theme': 'dark',
-      'onsuccess': onSuccess,
-      'onfailure': onFailure
-    });
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    EvolvitGoogle.init({ button: 'my-signin2', onSignIn: onGoogleSignIn, onSignOut: onGoogleSignOut })
+  })
 
 
 function postComment(){
@@ -120,4 +96,4 @@ function t(s,d){
 
 </script>
 
-<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+<script src="cms/googlesignin.js"></script>

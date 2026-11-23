@@ -5,7 +5,7 @@ evolvit_require_post();
 evolvit_require_same_origin();
 header('Content-Type: application/json');
 
-$claims = evolvit_google_verify_token(isset($_POST['idtoken']) ? $_POST['idtoken'] : '');
+$claims = evolvit_google_verify_token(isset($_POST['credential']) ? $_POST['credential'] : (isset($_POST['idtoken']) ? $_POST['idtoken'] : ''));
 if ($claims === null) evolvit_json_error('Invalid token', 401);
 evolvit_google_login($claims);
 echo json_encode(array(

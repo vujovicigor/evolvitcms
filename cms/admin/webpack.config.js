@@ -1,7 +1,4 @@
-//const autoprefixer = require('autoprefixer');
 const path = require('path');
-const webpack = require('webpack');
-//var request = require('request')
 
 module.exports = {
   entry: './app.js',
@@ -12,15 +9,12 @@ module.exports = {
   },
   module: {
     rules: [
-//      { test: /\.css/, loader: 'style-loader!css-loader!postcss-loader' },
-//      { test: /\.json/, loader: 'json-loader' },
-      { test: /\.html/, use: 'ractive-component-loader' }
+      { test: /\.html$/, use: 'ractive-component-loader' }
     ]
   },
-  node: {
-    console: true,
-    fs: 'empty',
-    net: 'empty',
-    tls: 'empty'
-  }
+  resolve: {
+    // node core modules are not used in the browser bundle
+    fallback: { fs: false, net: false, tls: false }
+  },
+  performance: { hints: false }
 };
