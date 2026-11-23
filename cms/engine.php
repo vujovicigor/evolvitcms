@@ -502,7 +502,9 @@
         if ($p !== false) {
             $target = preg_replace('/&forcethumb$/', '', substr($uri, $p));
             $dest = isset($_SERVER['HTTP_SEC_FETCH_DEST']) ? $_SERVER['HTTP_SEC_FETCH_DEST'] : '';
-            $isImgLoad = $dest === 'image' || ($dest === '' && isset($_GET['forcethumb']));
+            // block page navigations (phishing redirects); browsers that don't send
+            // Sec-Fetch-Dest (older Safari, plain-http origins) are allowed
+            $isImgLoad = $dest === 'image' || $dest === '';
             if ($isImgLoad && filter_var($target, FILTER_VALIDATE_URL) && preg_match('#^https?://#i', $target)) {
                 header('Location: ' . $target);
             } else {
