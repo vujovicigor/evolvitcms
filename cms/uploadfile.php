@@ -1,25 +1,15 @@
-<?PHP
+<?php
+require_once(dirname(__FILE__).'/security.php');
+evolvit_session_start();
+evolvit_require_post();
+evolvit_require_same_origin();
 include("engine.php");
-session_start();
-if ( !isset($_SESSION['_session_user_name']) ){
+if ( !isset($_SESSION['_session_user_name']) || !isset($_SESSION['_session_user_role']) || (int)$_SESSION['_session_user_role'] <= 1 ){
+    http_response_code(403);
     return;
 }
 
 if(!empty($_FILES['file']))
 {
-    //$path = "uploads/";
-    //$path = $path . basename( $_FILES['uploaded_file']['name']);
-    //print_r( $_FILES['file'] );
-    //print_r( $_POST );
-    
-    upload2sqlite( $_FILES['file'], $_POST['selectedfolder'] );
-    /*
-    if(move_uploaded_file($_FILES['uploaded_file']['tmp_name'], $path)) {
-        echo "The file ".  basename( $_FILES['uploaded_file']['name']). 
-        " has been uploaded";
-    } else{
-        echo "There was an error uploading the file, please try again!";
-    }
-    */
+    upload2sqlite( $_FILES['file'], isset($_POST['selectedfolder']) ? $_POST['selectedfolder'] : null );
 }
-?>

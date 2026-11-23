@@ -10,7 +10,7 @@
   <lastmod>2019-06-18T12:28:57+00:00</lastmod>
   <priority>1.00</priority>
 </url>
-{% for item in fetch("Post") if item.Publish == 'true'%}
+{% for item in fetch("Post")|filter(item => item.Publish == 'true') %}
 <url>
   <loc>{{_BASE}}post/{{item.Slug}}</loc>
   <lastmod>{{item.Date | date('Y-m-d\\TH:i:s')}}+00:00</lastmod>

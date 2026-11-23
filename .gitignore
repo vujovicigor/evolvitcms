@@ -3,4 +3,7 @@ node_modules/
 
 # ZEIT
 .now
-.vercel
+.vercel.DS_Store
+cms/config.php
+cms/uploads/*
+!cms/uploads/.htaccess

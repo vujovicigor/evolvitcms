@@ -1,4 +1,3 @@
-<?php 
+<?php
 include("engine.php");
-print_image($_GET['id']) ;
-?>
+print_image(isset($_GET['id']) ? (string)$_GET['id'] : '');

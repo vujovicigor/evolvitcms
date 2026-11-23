@@ -34,7 +34,7 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
-        {% for item in fetch("Post") if item.Publish == 'true' %}
+        {% for item in fetch("Post")|filter(item => item.Publish == 'true') %}
           <li class="nav-item {{_GET[1]==item.Slug?'active':''}}">
             <a class="nav-link text-uppercase" href="post/{{item.Slug}}"> {{item.Title}} </a>
           </li>
@@ -46,7 +46,7 @@
             Posts
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="max-height: calc(100vh - 6rem);overflow: auto; max-width: calc(100vw - 5rem)">
-            {% for item in fetch("Post") if item.Publish == 'true' %}
+            {% for item in fetch("Post")|filter(item => item.Publish == 'true') %}
               <a class="dropdown-item" href="post/{{item.Slug}}">{{item.Title}}</a>
             {% endfor %}          
           </div>

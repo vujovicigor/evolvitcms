@@ -1,5 +1,16 @@
 RewriteEngine On
-Options +FollowSymLinks
+Options +FollowSymLinks -Indexes
+
+# --- security: never serve databases, sources, caches or dotfiles directly ---
+RewriteRule (^|/)\.(?!well-known/) - [F,L]
+RewriteRule ^(cms/(db|vendor|twigcache|uploads)|twigtemplates)(/|$) - [F,L]
+RewriteRule \.(sqlite|sqlite3|db|db3|twig|lock|log|bak|sql)$ - [F,L,NC]
+RewriteRule ^cms/(composer\.json|config\.php|config\.sample\.php|security\.php|engine\.php|slug\.php|phpliteadmin.*)$ - [F,L,NC]
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
 
 # force https
 #RewriteCond %{HTTPS} off

@@ -8,7 +8,7 @@
 <div class="container">
   <h1 class="text-center my-4">All posts</h1>
   <div class="row">
-    {% for item in fetch("Post") if item.Publish == 'true'%}
+    {% for item in fetch("Post")|filter(item => item.Publish == 'true') %}
     <div class="col-xl-4 col-md-6 col-sm-12">
 
       <div class="card" style="width: 100%;">
