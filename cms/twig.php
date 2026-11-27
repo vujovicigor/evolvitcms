@@ -60,6 +60,22 @@ if (!EVOLVIT_TWIG_SANDBOX) {
     if (preg_match('/[\r\n]/', $header)) return;
     return header ( $header, $replace );
   }));
+} else {
+  // Untrusted templates may only describe their own response: a status line and a few content headers
+  // (style.css.twig, sitemap.xml.twig, data.json.twig, 404 pages). No Set-Cookie, Location, CSP, CORS, ...
+  $twig->addFunction(new \Twig\TwigFunction('header', function ($header, $replace = TRUE) {
+    if (!is_string($header) || strlen($header) > 200 || preg_match('/[\x00-\x1f\x7f]/', $header)) return;
+    if (preg_match('#^HTTP/[0-9.]+ ([1-5][0-9][0-9])(?: [A-Za-z \'-]*)?$#', $header, $m)) {
+      $code = (int)$m[1];
+      if ($code >= 200 && $code != 401 && !($code >= 300 && $code < 400)) http_response_code($code);
+      return;
+    }
+    if (!preg_match('/^(Content-Type|Cache-Control|Content-Language|X-Robots-Tag)\s*:\s*(.+)$/i', $header, $m)) return;
+    $value = trim($m[2]);
+    if (strcasecmp($m[1], 'Content-Type') == 0 && !preg_match('#^[a-z0-9.+-]+/[a-z0-9.+-]+(\s*;\s*charset=[A-Za-z0-9_-]+)?$#i', $value)) return;
+    if (preg_match('/[^ -~]/', $value)) return;
+    header($m[1].': '.$value, (bool)$replace);
+  }));
 }
 
 if (EVOLVIT_TWIG_SANDBOX) {
